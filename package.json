@@ -1,0 +1,79 @@
+{
+  "name": "@horiastanxd/claude-init",
+  "version": "0.1.0",
+  "description": "One command generates AI context files - CLAUDE.md, AGENTS.md, Cursor/Windsurf/Cline rules, GEMINI.md, Copilot, Aider, Junie, Warp - for any repository. CLI + MCP server, 100% local.",
+  "type": "module",
+  "bin": {
+    "claude-init": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "author": "Horia Stan",
+  "homepage": "https://github.com/horiastanxd/claude-init#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/horiastanxd/claude-init.git"
+  },
+  "bugs": {
+    "url": "https://github.com/horiastanxd/claude-init/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "mcp": "tsx src/cli.ts --mcp",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "cursor",
+    "windsurf",
+    "cline",
+    "gemini",
+    "copilot",
+    "codex",
+    "aider",
+    "junie",
+    "warp",
+    "ai",
+    "agent",
+    "context",
+    "llm",
+    "mcp",
+    "CLAUDE.md",
+    "AGENTS.md",
+    "cursorrules",
+    "code-generation",
+    "developer-tools"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist/"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "ora": "^8.1.1",
+    "simple-git": "^3.27.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^2.1.9",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,0 +1,12 @@
+export { analyzeProject } from './analyzer/index.js';
+export { generateAll, buildFiles, checkAll } from './generators/index.js';
+export type { PlannedFile } from './generators/index.js';
+export { TARGETS, TARGET_IDS, resolveTargets, invalidTargets } from './generators/registry.js';
+export type { Target } from './generators/registry.js';
+export { renderFull, renderRules } from './generators/render.js';
+export { generateClaudeMd } from './generators/claude-md.js';
+export { generateCursorRules } from './generators/cursor-rules.js';
+export { generateGeminiMd } from './generators/gemini-md.js';
+export { generateAgentsMd } from './generators/agents-md.js';
+export { generateCopilotInstructions } from './generators/copilot-instructions.js';
+export * from './types.js';
