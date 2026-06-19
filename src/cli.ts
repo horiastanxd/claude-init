@@ -6,6 +6,7 @@ import ora from 'ora';
 import { analyzeProject } from './analyzer/index.js';
 import { generateAll, checkAll } from './generators/index.js';
 import { generateWorkspacePackages, checkWorkspacePackages } from './generate-recursive.js';
+import { enrichAnalysis, createAnthropicCompleter } from './enrich.js';
 import { TARGETS, TARGET_IDS, invalidTargets } from './generators/registry.js';
 import { getVersion } from './version.js';
 
@@ -23,7 +24,15 @@ function parseTargets(raw: string): string[] {
 
 async function runGenerate(
   dir: string | undefined,
-  opts: { targets: string; output: string; overwrite: boolean; dryRun: boolean; recurse: boolean },
+  opts: {
+    targets: string;
+    output: string;
+    overwrite: boolean;
+    dryRun: boolean;
+    recurse: boolean;
+    enrich: boolean;
+    enrichModel: string;
+  },
 ): Promise<void> {
   const projectDir = resolve(dir ?? '.');
   const targets = parseTargets(opts.targets);
@@ -43,6 +52,21 @@ async function runGenerate(
         `(${analysis.techStack.language}${analysis.techStack.framework ? `, ${analysis.techStack.framework}` : ''})`,
       ),
   );
+
+  if (opts.enrich) {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      console.log(chalk.yellow('  --enrich set but ANTHROPIC_API_KEY is not set; skipping enrichment.'));
+    } else {
+      try {
+        const complete = await createAnthropicCompleter({ model: opts.enrichModel, apiKey });
+        analysis = await enrichAnalysis(analysis, complete);
+        console.log(chalk.dim(`  enriched description via ${opts.enrichModel}`));
+      } catch (err) {
+        console.log(chalk.yellow(`  Enrichment skipped: ${(err as Error).message}`));
+      }
+    }
+  }
 
   if (opts.dryRun) {
     console.log(JSON.stringify(analysis, null, 2));
@@ -149,6 +173,8 @@ async function main(): Promise<void> {
     .option('--overwrite', 'overwrite existing files', false)
     .option('--dry-run', 'print the analysis as JSON without writing files', false)
     .option('--recurse', 'also generate into each workspace package (monorepo)', false)
+    .option('--enrich', 'use an LLM to enrich the project description (opt-in; needs ANTHROPIC_API_KEY)', false)
+    .option('--enrich-model <model>', 'model to use for --enrich', 'claude-opus-4-8')
     .action(runGenerate);
 
   program

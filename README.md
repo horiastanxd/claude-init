@@ -85,6 +85,7 @@ npx @horiastanxd/claude-init -t claude,cursor     # only specific tools
 npx @horiastanxd/claude-init --overwrite          # refresh files that already exist
 npx @horiastanxd/claude-init --dry-run            # print the analysis as JSON, write nothing
 npx @horiastanxd/claude-init --recurse            # also generate into each workspace package (monorepo)
+npx @horiastanxd/claude-init --enrich             # opt-in: sharpen the description with an LLM (needs ANTHROPIC_API_KEY)
 npx @horiastanxd/claude-init list                 # show all targets and their paths
 ```
 
@@ -103,7 +104,14 @@ Options:
   --overwrite            overwrite existing files
   --dry-run              print the analysis as JSON, write nothing
   --recurse              also generate into each workspace package (monorepo)
+  --enrich               use an LLM to enrich the project description (opt-in)
+  --enrich-model <model> model for --enrich            (default: claude-opus-4-8)
 ```
+
+`--enrich` is the one feature that leaves your machine, and it is off by default -
+everything else is 100% local. It needs `ANTHROPIC_API_KEY` and the Anthropic SDK
+(`npm install @anthropic-ai/sdk`); if either is missing, generation continues without
+enrichment, so nothing breaks.
 
 For a monorepo, `--recurse` reads the workspaces from `package.json`
 (`workspaces`) or `pnpm-workspace.yaml`, then generates context files in the root
@@ -220,7 +228,6 @@ Contributions welcome - adding a new tool is usually a single entry in
 
 ## Roadmap
 
-- Optional LLM pass to enrich descriptions (opt-in, off by default)
 - More tools as their formats stabilize
 
 Ideas and PRs welcome.

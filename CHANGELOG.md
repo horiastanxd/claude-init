@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0]
+
+### Added
+- Opt-in `--enrich` flag: uses an LLM to rewrite the project description into one concise
+  sentence. Off by default - the tool stays 100% local unless you ask for it. Needs
+  `ANTHROPIC_API_KEY` and the Anthropic SDK (`npm install @anthropic-ai/sdk`, not a
+  dependency of this package); if either is missing, generation continues without
+  enrichment. Model is configurable with `--enrich-model` (default `claude-opus-4-8`).
+
 ## [0.7.0]
 
 ### Added
@@ -65,6 +74,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   Code, AGENTS.md, Cursor, Windsurf, Cline, Copilot, Gemini CLI, Aider, JetBrains Junie
   and Warp. Runs as a CLI or an MCP server. 100% local - no API key, no network.
 
+[0.8.0]: https://github.com/horiastanxd/claude-init/releases/tag/v0.8.0
 [0.7.0]: https://github.com/horiastanxd/claude-init/releases/tag/v0.7.0
 [0.6.0]: https://github.com/horiastanxd/claude-init/releases/tag/v0.6.0
 [0.5.0]: https://github.com/horiastanxd/claude-init/releases/tag/v0.5.0
