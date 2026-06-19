@@ -88,6 +88,36 @@ describe('detectCommands', () => {
     expect(c.test).toBe('cargo test');
   });
 
+  it('detects Maven commands from pom.xml', async () => {
+    await write('pom.xml', '<project></project>');
+    const c = await detectCommands(dir);
+    expect(c.build).toBe('mvn package');
+    expect(c.test).toBe('mvn test');
+  });
+
+  it('detects Gradle commands from build.gradle', async () => {
+    await write('build.gradle', 'plugins {}');
+    const c = await detectCommands(dir);
+    expect(c.build).toBe('./gradlew build');
+    expect(c.test).toBe('./gradlew test');
+  });
+
+  it('detects Ruby commands from Gemfile', async () => {
+    await write('Gemfile', 'source "https://rubygems.org"');
+    const c = await detectCommands(dir);
+    expect(c.install).toBe('bundle install');
+    expect(c.test).toBe('bundle exec rake');
+  });
+
+  it('detects PHP commands and scripts from composer.json', async () => {
+    await write('composer.json', JSON.stringify({ scripts: { test: 'phpunit', lint: 'phpcs', analyze: 'phpstan' } }));
+    const c = await detectCommands(dir);
+    expect(c.install).toBe('composer install');
+    expect(c.test).toBe('composer test');
+    expect(c.lint).toBe('composer lint');
+    expect(c.extra.analyze).toBe('composer analyze');
+  });
+
   it('surfaces Makefile targets as extra commands', async () => {
     await write(
       'Makefile',

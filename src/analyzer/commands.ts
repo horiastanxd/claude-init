@@ -76,7 +76,68 @@ async function detectBaseCommands(projectDir: string): Promise<ProjectCommands> 
       extra: {},
     };
   }
+  if (await pathExists(join(projectDir, 'pom.xml'))) {
+    return {
+      install: null,
+      dev: null,
+      build: 'mvn package',
+      test: 'mvn test',
+      lint: null,
+      format: null,
+      extra: {},
+    };
+  }
+  if (
+    (await pathExists(join(projectDir, 'build.gradle'))) ||
+    (await pathExists(join(projectDir, 'build.gradle.kts')))
+  ) {
+    return {
+      install: null,
+      dev: null,
+      build: './gradlew build',
+      test: './gradlew test',
+      lint: null,
+      format: null,
+      extra: {},
+    };
+  }
+  if (await pathExists(join(projectDir, 'Gemfile'))) {
+    return {
+      install: 'bundle install',
+      dev: null,
+      build: null,
+      test: 'bundle exec rake',
+      lint: null,
+      format: null,
+      extra: {},
+    };
+  }
+  if (await pathExists(join(projectDir, 'composer.json'))) {
+    return fromComposerJson(projectDir);
+  }
   return { ...EMPTY };
+}
+
+async function fromComposerJson(dir: string): Promise<ProjectCommands> {
+  const pkg = await readJson<{ scripts?: Record<string, unknown> }>(join(dir, 'composer.json'));
+  const scripts = pkg?.scripts ?? {};
+  const has = (script: string) => script in scripts;
+  const known = new Set(['test', 'lint']);
+
+  const extra: Record<string, string> = {};
+  for (const key of Object.keys(scripts)) {
+    if (!known.has(key)) extra[key] = `composer ${key}`;
+  }
+
+  return {
+    install: 'composer install',
+    dev: null,
+    build: null,
+    test: has('test') ? 'composer test' : null,
+    lint: has('lint') ? 'composer lint' : null,
+    format: null,
+    extra,
+  };
 }
 
 async function fromPackageJson(dir: string): Promise<ProjectCommands> {

@@ -182,7 +182,7 @@ Tools exposed: `analyze_project`, `generate_context_files`, `check_context_files
 - **Git** - default branch, remote, top authors, frequently changed files
 
 Languages: JS/TS (npm, pnpm, yarn, bun), Python (pip, uv, poetry), Rust (cargo),
-Go (modules), plus partial detection for Java, Ruby, and PHP.
+Go (modules), Java (Maven, Gradle), Ruby (Bundler), and PHP (Composer).
 
 ## Use as a library
 
