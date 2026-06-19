@@ -14,6 +14,7 @@ npx @horiastanxd/claude-init
 [![CI](https://github.com/horiastanxd/claude-init/actions/workflows/ci.yml/badge.svg)](https://github.com/horiastanxd/claude-init/actions/workflows/ci.yml)
 [![license](https://img.shields.io/npm/l/@horiastanxd/claude-init.svg?color=blue)](./LICENSE)
 [![node](https://img.shields.io/node/v/@horiastanxd/claude-init.svg?color=339933&logo=node.js)](https://nodejs.org)
+[![Glama MCP](https://glama.ai/mcp/servers/horiastanxd/claude-init/badges/score.svg)](https://glama.ai/mcp/servers/horiastanxd/claude-init)
 
 </div>
 
