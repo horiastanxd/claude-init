@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import chalk from 'chalk';
 import ora from 'ora';
 import { analyzeProject } from './analyzer/index.js';
+import { detectWorkspacePackages } from './analyzer/workspaces.js';
 import { generateAll, checkAll } from './generators/index.js';
 import { TARGETS, TARGET_IDS, invalidTargets } from './generators/registry.js';
 import { getVersion } from './version.js';
@@ -22,7 +23,7 @@ function parseTargets(raw: string): string[] {
 
 async function runGenerate(
   dir: string | undefined,
-  opts: { targets: string; output: string; overwrite: boolean; dryRun: boolean },
+  opts: { targets: string; output: string; overwrite: boolean; dryRun: boolean; recurse: boolean },
 ): Promise<void> {
   const projectDir = resolve(dir ?? '.');
   const targets = parseTargets(opts.targets);
@@ -60,10 +61,34 @@ async function runGenerate(
     console.log(chalk.yellow('  -'), `${f} ${chalk.dim('(exists, use --overwrite)')}`);
   }
 
-  if (!written.length && skipped.length) {
+  let total = written.length;
+  if (opts.recurse) {
+    const packages = await detectWorkspacePackages(projectDir);
+    for (const rel of packages) {
+      const pkgDir = resolve(projectDir, rel);
+      let pkgAnalysis;
+      try {
+        pkgAnalysis = await analyzeProject(pkgDir);
+      } catch {
+        continue;
+      }
+      const res = await generateAll(pkgAnalysis, {
+        outputDir: pkgDir,
+        targets,
+        overwrite: opts.overwrite,
+        minimal: false,
+      });
+      console.log(chalk.bold(`\n${rel}/`));
+      for (const f of res.written) console.log(chalk.green('  +'), f);
+      for (const f of res.skipped) console.log(chalk.yellow('  -'), `${f} ${chalk.dim('(exists)')}`);
+      total += res.written.length;
+    }
+  }
+
+  if (!total && skipped.length) {
     console.log(chalk.yellow('\nNothing written. Re-run with --overwrite to replace existing files.'));
   } else {
-    console.log(chalk.bold(`\nDone. ${written.length} file(s) generated.`));
+    console.log(chalk.bold(`\nDone. ${total} file(s) generated.`));
   }
 }
 
@@ -127,6 +152,7 @@ async function main(): Promise<void> {
     .option('-o, --output <dir>', 'output directory', '.')
     .option('--overwrite', 'overwrite existing files', false)
     .option('--dry-run', 'print the analysis as JSON without writing files', false)
+    .option('--recurse', 'also generate into each workspace package (monorepo)', false)
     .action(runGenerate);
 
   program

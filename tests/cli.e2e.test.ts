@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtemp, rm, writeFile, readFile } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile, readFile, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { runCli } from './helpers.js';
@@ -49,6 +49,19 @@ describe('CLI e2e (built binary)', () => {
     const stale = await runCli(['check', dir, '-o', dir]);
     expect(stale.code).toBe(1);
     expect(stale.stdout).toContain('stale');
+  });
+
+  it('--recurse generates into workspace packages', async () => {
+    await writeFile(
+      join(dir, 'package.json'),
+      JSON.stringify({ name: 'mono', workspaces: ['packages/*'] }),
+      'utf-8',
+    );
+    await mkdir(join(dir, 'packages', 'lib'), { recursive: true });
+    await writeFile(join(dir, 'packages', 'lib', 'package.json'), JSON.stringify({ name: 'lib' }), 'utf-8');
+    const r = await runCli(['generate', dir, '-o', dir, '-t', 'claude', '--recurse']);
+    expect(r.code).toBe(0);
+    expect(await readFile(join(dir, 'packages', 'lib', 'CLAUDE.md'), 'utf-8')).toContain('# lib');
   });
 
   it('rejects an invalid target with a non-zero exit', async () => {

@@ -84,6 +84,7 @@ npx @horiastanxd/claude-init ./path/to/repo       # analyze a different director
 npx @horiastanxd/claude-init -t claude,cursor     # only specific tools
 npx @horiastanxd/claude-init --overwrite          # refresh files that already exist
 npx @horiastanxd/claude-init --dry-run            # print the analysis as JSON, write nothing
+npx @horiastanxd/claude-init --recurse            # also generate into each workspace package (monorepo)
 npx @horiastanxd/claude-init list                 # show all targets and their paths
 ```
 
@@ -101,7 +102,12 @@ Options:
   -o, --output <dir>     output directory                        (default: .)
   --overwrite            overwrite existing files
   --dry-run              print the analysis as JSON, write nothing
+  --recurse              also generate into each workspace package (monorepo)
 ```
+
+For a monorepo, `--recurse` reads the workspaces from `package.json`
+(`workspaces`) or `pnpm-workspace.yaml`, then generates context files in the root
+and in each package, analyzing every package on its own.
 
 ## Keep context files fresh
 
@@ -213,7 +219,6 @@ Contributions welcome - adding a new tool is usually a single entry in
 
 ## Roadmap
 
-- Monorepo-aware generation (per-package context files)
 - Optional LLM pass to enrich descriptions (opt-in, off by default)
 - More tools as their formats stabilize
 
