@@ -70,6 +70,39 @@ export const TARGETS: Target[] = [
     ],
   },
   {
+    id: 'continue',
+    label: 'Continue',
+    tools: 'Continue (.continue/rules)',
+    files: [
+      {
+        path: join('.continue', 'rules', 'project.md'),
+        render: (a) => renderRules(a, { title: a.name }),
+      },
+    ],
+  },
+  {
+    id: 'kilocode',
+    label: 'Kilo Code',
+    tools: 'Kilo Code',
+    files: [
+      {
+        path: join('.kilocode', 'rules', 'project.md'),
+        render: (a) => renderRules(a, { title: a.name }),
+      },
+    ],
+  },
+  {
+    id: 'trae',
+    label: 'Trae',
+    tools: 'Trae IDE',
+    files: [
+      {
+        path: join('.trae', 'rules', 'project_rules.md'),
+        render: (a) => renderRules(a, { title: a.name }),
+      },
+    ],
+  },
+  {
     id: 'copilot',
     label: 'GitHub Copilot',
     tools: 'GitHub Copilot',

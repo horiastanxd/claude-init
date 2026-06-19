@@ -1,7 +1,7 @@
 {
   "name": "@horiastanxd/claude-init",
   "version": "0.3.0",
-  "description": "One command generates AI context files - CLAUDE.md, AGENTS.md, Cursor/Windsurf/Cline rules, GEMINI.md, Copilot, Aider, Junie, Warp - for any repository. CLI + MCP server, 100% local.",
+  "description": "One command generates AI context files - CLAUDE.md, AGENTS.md, Cursor/Windsurf/Cline/Continue/Kilo Code/Trae rules, GEMINI.md, Copilot, Aider, Junie, Warp - for any repository. CLI + MCP server, 100% local.",
   "type": "module",
   "bin": {
     "claude-init": "./dist/cli.js"
@@ -38,6 +38,9 @@
     "cursor",
     "windsurf",
     "cline",
+    "continue",
+    "kilocode",
+    "trae",
     "gemini",
     "copilot",
     "codex",

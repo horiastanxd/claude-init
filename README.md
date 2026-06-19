@@ -4,7 +4,7 @@
 
 **One command generates the AI context files for every coding assistant - from one repo scan.**
 
-`CLAUDE.md` · `AGENTS.md` · Cursor · Windsurf · Cline · Copilot · `GEMINI.md` · Aider · Junie · Warp
+`CLAUDE.md` · `AGENTS.md` · Cursor · Windsurf · Cline · Continue · Kilo Code · Trae · Copilot · `GEMINI.md` · Aider · Junie · Warp
 
 ```bash
 npx @horiastanxd/claude-init
@@ -28,7 +28,7 @@ npx @horiastanxd/claude-init
 ## Why
 
 Every AI coding tool wants a file describing your project - and they all use a
-different name and format. Keeping ten of them in sync by hand is busywork, and the
+different name and format. Keeping over a dozen of them in sync by hand is busywork, and the
 moment your stack changes they go stale.
 
 `claude-init` scans your repo once - stack, scripts, structure, env vars, conventions,
@@ -42,13 +42,16 @@ $ npx @horiastanxd/claude-init
   + .cursor/rules/project.mdc
   + .windsurf/rules/project.md
   + .clinerules/project.md
+  + .continue/rules/project.md
+  + .kilocode/rules/project.md
+  + .trae/rules/project_rules.md
   + .github/copilot-instructions.md
   + GEMINI.md
   + CONVENTIONS.md
   + .junie/guidelines.md
   + WARP.md
 
-Done. 10 file(s) generated.
+Done. 13 file(s) generated.
 ```
 
 ## Supported tools
@@ -60,6 +63,9 @@ Done. 10 file(s) generated.
 | `cursor` | `.cursor/rules/project.mdc` | Cursor (modern `.mdc` rules) |
 | `windsurf` | `.windsurf/rules/project.md` | Windsurf / Codeium |
 | `cline` | `.clinerules/project.md` | Cline, Roo Code |
+| `continue` | `.continue/rules/project.md` | Continue |
+| `kilocode` | `.kilocode/rules/project.md` | Kilo Code |
+| `trae` | `.trae/rules/project_rules.md` | Trae IDE |
 | `copilot` | `.github/copilot-instructions.md` | GitHub Copilot |
 | `gemini` | `GEMINI.md` | Gemini CLI |
 | `aider` | `CONVENTIONS.md` | Aider |
@@ -207,9 +213,9 @@ Contributions welcome - adding a new tool is usually a single entry in
 
 ## Roadmap
 
-- More tools (Zed dedicated rules, Continue, Kilo Code, Trae)
 - Monorepo-aware generation (per-package context files)
 - Optional LLM pass to enrich descriptions (opt-in, off by default)
+- More tools as their formats stabilize
 
 Ideas and PRs welcome.
 

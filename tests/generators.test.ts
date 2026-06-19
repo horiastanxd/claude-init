@@ -92,6 +92,13 @@ describe('buildFiles', () => {
     expect(paths.some((p) => p.includes('clinerules'))).toBe(true);
   });
 
+  it('produces the newer rules-based targets', () => {
+    const paths = buildFiles(sample).map((f) => f.relPath);
+    expect(paths.some((p) => p.includes('.continue') && p.endsWith('.md'))).toBe(true);
+    expect(paths.some((p) => p.includes('.kilocode') && p.endsWith('.md'))).toBe(true);
+    expect(paths.some((p) => p.includes('.trae') && p.endsWith('project_rules.md'))).toBe(true);
+  });
+
   it('filters by requested targets', () => {
     const files = buildFiles(sample, ['claude', 'gemini']);
     expect(files.map((f) => f.relPath).sort()).toEqual(['CLAUDE.md', 'GEMINI.md']);
