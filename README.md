@@ -107,7 +107,8 @@ Options:
 
 For a monorepo, `--recurse` reads the workspaces from `package.json`
 (`workspaces`) or `pnpm-workspace.yaml`, then generates context files in the root
-and in each package, analyzing every package on its own.
+and in each package, analyzing every package on its own. It works for both
+`generate --recurse` and `check --recurse` (and the MCP tools take a `recurse` flag).
 
 ## Keep context files fresh
 

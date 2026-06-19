@@ -4,8 +4,8 @@ import { resolve } from 'node:path';
 import chalk from 'chalk';
 import ora from 'ora';
 import { analyzeProject } from './analyzer/index.js';
-import { detectWorkspacePackages } from './analyzer/workspaces.js';
 import { generateAll, checkAll } from './generators/index.js';
+import { generateWorkspacePackages, checkWorkspacePackages } from './generate-recursive.js';
 import { TARGETS, TARGET_IDS, invalidTargets } from './generators/registry.js';
 import { getVersion } from './version.js';
 
@@ -63,25 +63,11 @@ async function runGenerate(
 
   let total = written.length;
   if (opts.recurse) {
-    const packages = await detectWorkspacePackages(projectDir);
-    for (const rel of packages) {
-      const pkgDir = resolve(projectDir, rel);
-      let pkgAnalysis;
-      try {
-        pkgAnalysis = await analyzeProject(pkgDir);
-      } catch {
-        continue;
-      }
-      const res = await generateAll(pkgAnalysis, {
-        outputDir: pkgDir,
-        targets,
-        overwrite: opts.overwrite,
-        minimal: false,
-      });
-      console.log(chalk.bold(`\n${rel}/`));
-      for (const f of res.written) console.log(chalk.green('  +'), f);
-      for (const f of res.skipped) console.log(chalk.yellow('  -'), `${f} ${chalk.dim('(exists)')}`);
-      total += res.written.length;
+    for (const pkg of await generateWorkspacePackages(projectDir, { targets, overwrite: opts.overwrite })) {
+      console.log(chalk.bold(`\n${pkg.rel}/`));
+      for (const f of pkg.written) console.log(chalk.green('  +'), f);
+      for (const f of pkg.skipped) console.log(chalk.yellow('  -'), `${f} ${chalk.dim('(exists)')}`);
+      total += pkg.written.length;
     }
   }
 
@@ -94,14 +80,11 @@ async function runGenerate(
 
 async function runCheck(
   dir: string | undefined,
-  opts: { targets: string; output: string },
+  opts: { targets: string; output: string; recurse: boolean },
 ): Promise<void> {
   const projectDir = resolve(dir ?? '.');
   const targets = parseTargets(opts.targets);
-  const analysis = await analyzeProject(projectDir);
-  const { entries, drifted } = await checkAll(analysis, resolve(opts.output), targets);
-
-  for (const e of entries) {
+  const printEntry = (e: { status: string; path: string }) => {
     const mark =
       e.status === 'ok'
         ? chalk.green('  ok     ')
@@ -109,9 +92,22 @@ async function runCheck(
           ? chalk.yellow('  stale  ')
           : chalk.red('  missing');
     console.log(mark, e.path);
+  };
+
+  const analysis = await analyzeProject(projectDir);
+  const { entries, drifted } = await checkAll(analysis, resolve(opts.output), targets);
+  entries.forEach(printEntry);
+
+  let anyDrift = drifted;
+  if (opts.recurse) {
+    for (const pkg of await checkWorkspacePackages(projectDir, targets)) {
+      console.log(chalk.bold(`\n${pkg.rel}/`));
+      pkg.entries.forEach(printEntry);
+      anyDrift = anyDrift || pkg.drifted;
+    }
   }
 
-  if (drifted) {
+  if (anyDrift) {
     console.log(chalk.red('\nContext files are out of date. Run `claude-init --overwrite` to refresh.'));
     process.exitCode = 1;
   } else {
@@ -161,6 +157,7 @@ async function main(): Promise<void> {
     .argument('[dir]', 'project directory', '.')
     .option('-t, --targets <list>', `comma-separated (${TARGET_IDS.join(',')},all)`, 'all')
     .option('-o, --output <dir>', 'output directory', '.')
+    .option('--recurse', 'also check each workspace package (monorepo)', false)
     .action(runCheck);
 
   program.command('list').description('List supported targets and their output paths').action(runList);

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { CLI } from './helpers.js';
@@ -103,6 +103,22 @@ describe('MCP server e2e', () => {
     const text = (r.result as { content: Array<{ text: string }> }).content[0]!.text;
     expect(text).toContain('CLAUDE.md');
     expect(text).toContain('AGENTS.md');
+  });
+
+  it('generate_context_files with recurse writes into workspace packages', async () => {
+    await writeFile(
+      join(dir, 'package.json'),
+      JSON.stringify({ name: 'mono', workspaces: ['packages/*'] }),
+      'utf-8',
+    );
+    await mkdir(join(dir, 'packages', 'lib'), { recursive: true });
+    await writeFile(join(dir, 'packages', 'lib', 'package.json'), JSON.stringify({ name: 'lib' }), 'utf-8');
+    const r = await client.send(7, 'tools/call', {
+      name: 'generate_context_files',
+      arguments: { path: dir, targets: ['claude'], overwrite: true, recurse: true },
+    });
+    const text = (r.result as { content: Array<{ text: string }> }).content[0]!.text;
+    expect(text).toContain(join('packages', 'lib', 'CLAUDE.md'));
   });
 
   it('check_context_files reports drift then up to date', async () => {

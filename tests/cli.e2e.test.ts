@@ -64,6 +64,24 @@ describe('CLI e2e (built binary)', () => {
     expect(await readFile(join(dir, 'packages', 'lib', 'CLAUDE.md'), 'utf-8')).toContain('# lib');
   });
 
+  it('check --recurse reports drift inside a workspace package', async () => {
+    await writeFile(
+      join(dir, 'package.json'),
+      JSON.stringify({ name: 'mono', workspaces: ['packages/*'] }),
+      'utf-8',
+    );
+    await mkdir(join(dir, 'packages', 'lib'), { recursive: true });
+    await writeFile(join(dir, 'packages', 'lib', 'package.json'), JSON.stringify({ name: 'lib' }), 'utf-8');
+    await runCli(['generate', dir, '-o', dir, '-t', 'claude', '--recurse', '--overwrite']);
+
+    const fresh = await runCli(['check', dir, '-o', dir, '-t', 'claude', '--recurse']);
+    expect(fresh.code).toBe(0);
+
+    await writeFile(join(dir, 'packages', 'lib', 'CLAUDE.md'), 'stale', 'utf-8');
+    const stale = await runCli(['check', dir, '-o', dir, '-t', 'claude', '--recurse']);
+    expect(stale.code).toBe(1);
+  });
+
   it('rejects an invalid target with a non-zero exit', async () => {
     const r = await runCli(['generate', dir, '-o', dir, '-t', 'bogus']);
     expect(r.code).not.toBe(0);

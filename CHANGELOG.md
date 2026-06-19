@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0]
+
+### Added
+- `check --recurse` verifies each workspace package too, exiting non-zero if any
+  package has drifted. The MCP `generate_context_files` and `check_context_files`
+  tools gained a matching `recurse` option, so monorepo generation and checking work
+  over MCP as well.
+
 ## [0.6.0]
 
 ### Added
@@ -57,6 +65,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   Code, AGENTS.md, Cursor, Windsurf, Cline, Copilot, Gemini CLI, Aider, JetBrains Junie
   and Warp. Runs as a CLI or an MCP server. 100% local - no API key, no network.
 
+[0.7.0]: https://github.com/horiastanxd/claude-init/releases/tag/v0.7.0
 [0.6.0]: https://github.com/horiastanxd/claude-init/releases/tag/v0.6.0
 [0.5.0]: https://github.com/horiastanxd/claude-init/releases/tag/v0.5.0
 [0.4.0]: https://github.com/horiastanxd/claude-init/releases/tag/v0.4.0
