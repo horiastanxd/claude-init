@@ -49,6 +49,18 @@ describe('render edge cases', () => {
     expect(rules).not.toContain('## Environment');
   });
 
+  it('renders runner-only commands (extra) when no standard commands exist', () => {
+    const a: ProjectAnalysis = {
+      ...empty,
+      commands: { ...empty.commands, extra: { build: 'make build', deploy: 'make deploy' } },
+    };
+    const md = renderFull(a, { title: 'bare' });
+    expect(md).toContain('## Commands');
+    expect(md).toContain('Other scripts:');
+    expect(md).toContain('`make build`');
+    expect(md).toContain('`make deploy`');
+  });
+
   it('output always ends with a single trailing newline', () => {
     expect(renderRules(empty, { title: 'x' }).endsWith('\n')).toBe(true);
     expect(renderRules(empty, { title: 'x' }).endsWith('\n\n')).toBe(false);

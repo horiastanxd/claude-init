@@ -24,18 +24,21 @@ export function commandsSection(a: ProjectAnalysis): string {
     ['Format', c.format],
   ];
   const present = pairs.filter((p): p is [string, string] => Boolean(p[1]));
-  if (!present.length) return '';
+  const block: string[] = [];
 
-  const width = Math.max(...present.map(([, cmd]) => cmd.length));
-  const block = [
-    '```bash',
-    ...present.map(([label, cmd]) => `${cmd.padEnd(width)}  # ${label.toLowerCase()}`),
-    '```',
-  ];
+  if (present.length) {
+    const width = Math.max(...present.map(([, cmd]) => cmd.length));
+    block.push(
+      '```bash',
+      ...present.map(([label, cmd]) => `${cmd.padEnd(width)}  # ${label.toLowerCase()}`),
+      '```',
+    );
+  }
 
   const extraKeys = Object.keys(c.extra);
   if (extraKeys.length) {
-    block.push('', 'Other scripts:');
+    if (block.length) block.push('');
+    block.push('Other scripts:');
     for (const key of extraKeys) block.push(`- \`${c.extra[key]}\``);
   }
   return block.join('\n');

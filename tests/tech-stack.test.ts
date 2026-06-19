@@ -85,6 +85,66 @@ describe('detectCommands', () => {
     expect(c.build).toBe('cargo build --release');
     expect(c.test).toBe('cargo test');
   });
+
+  it('surfaces Makefile targets as extra commands', async () => {
+    await write(
+      'Makefile',
+      '.PHONY: build test\n\nbuild:\n\tgcc -o app main.c\n\ntest:\n\t./run-tests.sh\n\ndeploy:\n\tscp app server:/\n',
+    );
+    const c = await detectCommands(dir);
+    expect(c.extra.build).toBe('make build');
+    expect(c.extra.test).toBe('make test');
+    expect(c.extra.deploy).toBe('make deploy');
+  });
+
+  it('ignores Makefile variable assignments and pattern rules', async () => {
+    await write('Makefile', 'CC := gcc\nCFLAGS = -O2\n\n%.o: %.c\n\t$(CC) -c $<\n\nall:\n\techo hi\n');
+    const c = await detectCommands(dir);
+    expect(Object.keys(c.extra)).toEqual(['all']);
+  });
+
+  it('surfaces justfile recipes as extra commands', async () => {
+    await write(
+      'justfile',
+      'set shell := ["bash", "-c"]\n\nbuild:\n  cargo build\n\nlint args="":\n  cargo clippy {{args}}\n',
+    );
+    const c = await detectCommands(dir);
+    expect(c.extra.build).toBe('just build');
+    expect(c.extra.lint).toBe('just lint');
+  });
+
+  it('surfaces Taskfile tasks as extra commands', async () => {
+    await write(
+      'Taskfile.yml',
+      'version: "3"\n\ntasks:\n  build:\n    cmds:\n      - go build\n  test:\n    cmds:\n      - go test ./...\n',
+    );
+    const c = await detectCommands(dir);
+    expect(c.extra.build).toBe('task build');
+    expect(c.extra.test).toBe('task test');
+  });
+
+  it('captures every target on a multi-target Makefile line', async () => {
+    await write('Makefile', 'clean distclean:\n\trm -rf build\n');
+    const c = await detectCommands(dir);
+    expect(c.extra.clean).toBe('make clean');
+    expect(c.extra.distclean).toBe('make distclean');
+  });
+
+  it('does not treat justfile recipe parameters as separate recipes', async () => {
+    await write('justfile', 'build target:\n  echo {{target}}\n');
+    const c = await detectCommands(dir);
+    expect(c.extra.build).toBe('just build');
+    expect(c.extra.target).toBeUndefined();
+  });
+
+  it('merges Makefile targets without duplicating filled standard commands', async () => {
+    await write('package.json', JSON.stringify({ scripts: { test: 'vitest', build: 'tsc' } }));
+    await write('Makefile', 'test:\n\t./integration.sh\n\nrelease:\n\tnpm publish\n');
+    const c = await detectCommands(dir);
+    expect(c.test).toBe('npm run test');
+    expect(c.extra.test).toBeUndefined();
+    expect(c.extra.release).toBe('make release');
+  });
 });
 
 describe('detectEnvVars (real file)', () => {
