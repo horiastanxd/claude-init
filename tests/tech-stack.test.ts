@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 import { detectTechStack } from '../src/analyzer/tech-stack.js';
 import { detectCommands } from '../src/analyzer/commands.js';
 import { detectEnvVars } from '../src/analyzer/env-vars.js';
@@ -15,7 +15,9 @@ afterEach(async () => {
 });
 
 async function write(rel: string, content: string): Promise<void> {
-  await writeFile(join(dir, rel), content, 'utf-8');
+  const full = join(dir, rel);
+  await mkdir(dirname(full), { recursive: true });
+  await writeFile(full, content, 'utf-8');
 }
 
 describe('detectTechStack', () => {
@@ -144,6 +146,44 @@ describe('detectCommands', () => {
     expect(c.test).toBe('npm run test');
     expect(c.extra.test).toBeUndefined();
     expect(c.extra.release).toBe('make release');
+  });
+
+  it('surfaces recognised commands from GitHub Actions workflows', async () => {
+    await write(
+      '.github/workflows/ci.yml',
+      'name: CI\non: [push]\njobs:\n  test:\n    steps:\n      - uses: actions/checkout@v4\n      - run: npm ci\n      - name: checks\n        run: |\n          npm run lint\n          cargo audit\n      - run: pytest -q\n',
+    );
+    const c = await detectCommands(dir);
+    const vals = Object.values(c.extra);
+    expect(vals).toContain('npm run lint');
+    expect(vals).toContain('cargo audit');
+    expect(vals).toContain('pytest -q');
+    expect(vals).not.toContain('npm ci');
+    expect(vals).not.toContain('actions/checkout@v4');
+  });
+
+  it('keeps CI script commands whose names contain install-like words', async () => {
+    await write(
+      '.github/workflows/ci.yml',
+      'jobs:\n  x:\n    steps:\n      - run: pnpm run test:ci\n      - run: npm run typecheck\n',
+    );
+    const c = await detectCommands(dir);
+    const vals = Object.values(c.extra);
+    expect(vals).toContain('pnpm run test:ci');
+    expect(vals).toContain('npm run typecheck');
+  });
+
+  it('does not duplicate CI commands already covered by package.json', async () => {
+    await write('package.json', JSON.stringify({ scripts: { build: 'tsc', test: 'vitest' } }));
+    await write(
+      '.github/workflows/ci.yml',
+      'jobs:\n  b:\n    steps:\n      - run: npm run build\n      - run: npm run test\n      - run: npm run release\n',
+    );
+    const c = await detectCommands(dir);
+    const vals = Object.values(c.extra);
+    expect(vals).not.toContain('npm run build');
+    expect(vals).not.toContain('npm run test');
+    expect(vals).toContain('npm run release');
   });
 });
 

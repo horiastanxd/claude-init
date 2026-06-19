@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+import { readdir } from 'node:fs/promises';
 import { pathExists, readJson, readText, detectPackageManager } from '../utils.js';
 import type { ProjectCommands } from '../types.js';
 
@@ -31,7 +32,9 @@ const STANDARD_SLOTS = ['install', 'dev', 'build', 'test', 'lint', 'format'] as 
 export async function detectCommands(projectDir: string): Promise<ProjectCommands> {
   const base = await detectBaseCommands(projectDir);
   const runners = await detectRunnerCommands(projectDir);
-  return mergeRunnerCommands(base, runners);
+  const merged = mergeRunnerCommands(base, runners);
+  const ci = await detectCiCommands(projectDir);
+  return mergeCiCommands(merged, ci);
 }
 
 /** Language-toolchain commands derived from the manifest (package.json, Cargo, ...). */
@@ -195,4 +198,101 @@ function mergeRunnerCommands(
     extra[name] = cmd;
   }
   return { ...base, extra };
+}
+
+/** Tools whose invocation in a CI `run:` step counts as a project command worth surfacing. */
+const CI_RUNNERS = new Set([
+  'npm', 'pnpm', 'yarn', 'bun', 'npx', 'pnpx', 'make', 'just', 'task', 'cargo', 'go',
+  'python', 'python3', 'pytest', 'ruff', 'mypy', 'tox', 'poetry', 'uv', 'uvx', 'node',
+  'deno', 'gradle', './gradlew', 'gradlew', 'mvn', './mvnw', 'dotnet', 'rake', 'bundle',
+  'composer', 'php', 'rails', 'mix', 'gleam', 'swift', 'flutter', 'dart', 'docker',
+  'docker-compose', 'terraform', 'tsc', 'eslint', 'prettier', 'vitest', 'jest',
+  'playwright', 'cypress',
+]);
+
+// Dependency-install invocations - already covered by the install slot, not worth listing.
+// The install keyword must be the subcommand right after the tool (so `pnpm run test:ci`
+// is kept, only `pnpm install` / `npm ci` are dropped).
+const CI_INSTALL = /^(npm|pnpm|yarn|bun|pip|pip3|poetry|uv|bundle|gem|composer)\s+(install|ci|sync|i)\b/;
+const CI_GO_INSTALL = /^go\s+(get|mod\s+download)\b/;
+const CI_BARE_INSTALL = /^(yarn|bun)$/;
+
+/** Normalise one shell command from a CI step; null if it is noise or an install. */
+function cleanCiCommand(raw: string): string | null {
+  let cmd = raw.trim();
+  if (cmd.startsWith('sudo ')) cmd = cmd.slice(5).trim();
+  cmd = cmd.replace(/^["']|["']$/g, '').trim();
+  if (!cmd) return null;
+  const first = cmd.split(/\s+/)[0];
+  if (!first || !CI_RUNNERS.has(first)) return null;
+  if (CI_INSTALL.test(cmd) || CI_GO_INSTALL.test(cmd) || CI_BARE_INSTALL.test(cmd)) return null;
+  return cmd;
+}
+
+/**
+ * Pull recognised commands out of a GitHub Actions workflow. Handles both inline
+ * (`run: npm test`) and block-scalar (`run: |`) steps, splitting on `&&` / `;`.
+ * CI config is often the real source of truth for how a project builds and ships.
+ */
+function parseWorkflowCommands(content: string): string[] {
+  const out: string[] = [];
+  const lines = content.split('\n');
+  const push = (raw: string) => {
+    for (const part of raw.split(/&&|;/)) {
+      const c = cleanCiCommand(part);
+      if (c && !out.includes(c)) out.push(c);
+    }
+  };
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]!;
+    const idx = line.indexOf('run:');
+    if (idx < 0 || !/^[\s-]*$/.test(line.slice(0, idx))) continue;
+    const value = line.slice(idx + 4).trim();
+    if (value === '' || /^[|>][+-]?$/.test(value)) {
+      for (let j = i + 1; j < lines.length; j++) {
+        const l = lines[j]!;
+        if (l.trim() === '') continue;
+        if (l.length - l.trimStart().length <= idx) break;
+        push(l.trim());
+      }
+    } else {
+      push(value);
+    }
+  }
+  return out;
+}
+
+async function detectCiCommands(projectDir: string): Promise<string[]> {
+  const dir = join(projectDir, '.github', 'workflows');
+  let files: string[];
+  try {
+    files = await readdir(dir);
+  } catch {
+    return [];
+  }
+  const out: string[] = [];
+  for (const file of files.sort()) {
+    if (!/\.ya?ml$/i.test(file)) continue;
+    const content = await readText(join(dir, file));
+    if (content === null) continue;
+    for (const cmd of parseWorkflowCommands(content)) {
+      if (!out.includes(cmd)) out.push(cmd);
+    }
+  }
+  return out;
+}
+
+/** Add CI commands to `extra`, skipping any command string already surfaced elsewhere. */
+function mergeCiCommands(cmds: ProjectCommands, ci: string[]): ProjectCommands {
+  const known = new Set<string>([
+    ...STANDARD_SLOTS.map((slot) => cmds[slot]).filter((v): v is string => v !== null),
+    ...Object.values(cmds.extra),
+  ]);
+  const extra = { ...cmds.extra };
+  for (const cmd of ci) {
+    if (known.has(cmd) || cmd in extra) continue;
+    extra[cmd] = cmd;
+    known.add(cmd);
+  }
+  return { ...cmds, extra };
 }

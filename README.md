@@ -169,7 +169,7 @@ Tools exposed: `analyze_project`, `generate_context_files`, `check_context_files
 ## What gets detected
 
 - **Stack** - language, framework, runtime, package manager, database, test runner, build tool
-- **Commands** - install / dev / build / test / lint / format, plus other scripts and `Makefile` / `justfile` / `Taskfile` targets
+- **Commands** - install / dev / build / test / lint / format, plus other scripts, `Makefile` / `justfile` / `Taskfile` targets, and commands from `.github/workflows`
 - **Structure** - a trimmed file tree, entry points, config files
 - **Conventions** - strict mode, linter, formatter, import style, commit convention
 - **Env vars** - parsed from `.env.example`, with inline comments as descriptions
