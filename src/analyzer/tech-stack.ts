@@ -26,13 +26,31 @@ export async function detectTechStack(projectDir: string): Promise<TechStack> {
     ['composer.json', parseComposerJson],
   ];
 
+  const ci = await detectCi(projectDir);
+
   for (const [file, parser] of manifest) {
     if (await pathExists(join(projectDir, file))) {
-      return { ...EMPTY, ...(await parser(projectDir)) };
+      return { ...EMPTY, ...(await parser(projectDir)), ci };
     }
   }
 
-  return { ...EMPTY };
+  return { ...EMPTY, ci };
+}
+
+async function detectCi(dir: string): Promise<string | null> {
+  const providers: Array<[string, string]> = [
+    ['.github/workflows', 'GitHub Actions'],
+    ['.gitlab-ci.yml', 'GitLab CI'],
+    ['.circleci/config.yml', 'CircleCI'],
+    ['azure-pipelines.yml', 'Azure Pipelines'],
+    ['Jenkinsfile', 'Jenkins'],
+    ['.travis.yml', 'Travis CI'],
+    ['.drone.yml', 'Drone CI'],
+  ];
+  for (const [path, name] of providers) {
+    if (await pathExists(join(dir, path))) return name;
+  }
+  return null;
 }
 
 async function parsePackageJson(dir: string): Promise<Partial<TechStack>> {
@@ -68,17 +86,22 @@ async function parsePackageJson(dir: string): Promise<Partial<TechStack>> {
 
   if (has('@prisma/client') || has('prisma')) result.database = 'Prisma ORM';
   else if (has('drizzle-orm')) result.database = 'Drizzle ORM';
+  else if (has('@supabase/supabase-js')) result.database = 'Supabase';
   else if (has('mongoose')) result.database = 'MongoDB/Mongoose';
   else if (has('pg') || has('postgres')) result.database = 'PostgreSQL';
   else if (has('mysql2')) result.database = 'MySQL';
+  else if (has('better-sqlite3') || has('sqlite3') || has('@libsql/client')) result.database = 'SQLite';
+  else if (has('ioredis') || has('redis')) result.database = 'Redis';
 
   if (has('vitest')) result.testing = 'Vitest';
   else if (has('jest')) result.testing = 'Jest';
   else if (has('@playwright/test')) result.testing = 'Playwright';
   else if (has('mocha')) result.testing = 'Mocha';
 
-  if (has('vite')) result.buildTool = 'Vite';
+  if (has('nx')) result.buildTool = 'Nx';
   else if (has('turbo')) result.buildTool = 'Turborepo';
+  else if (has('lerna')) result.buildTool = 'Lerna';
+  else if (has('vite')) result.buildTool = 'Vite';
   else if (has('esbuild')) result.buildTool = 'esbuild';
   else if (has('webpack')) result.buildTool = 'webpack';
 

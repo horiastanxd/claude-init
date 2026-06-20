@@ -9,6 +9,7 @@ export function stackSection(a: ProjectAnalysis): string {
   if (t.database) lines.push(`- Database: ${t.database}`);
   if (t.testing) lines.push(`- Testing: ${t.testing}`);
   if (t.buildTool) lines.push(`- Build tool: ${t.buildTool}`);
+  if (t.ci) lines.push(`- CI: ${t.ci}`);
   if (t.extraLibraries.length) lines.push(`- Notable libraries: ${t.extraLibraries.join(', ')}`);
   return lines.join('\n');
 }

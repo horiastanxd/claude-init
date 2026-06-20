@@ -108,6 +108,49 @@ describe('detectTechStack', () => {
     const t = await detectTechStack(dir);
     expect(t).toMatchObject({ language: 'Java', framework: 'Spring Boot' });
   });
+
+  it('detects SQLite', async () => {
+    await write('package.json', JSON.stringify({ dependencies: { 'better-sqlite3': '11' } }));
+    expect((await detectTechStack(dir)).database).toBe('SQLite');
+  });
+
+  it('detects Redis', async () => {
+    await write('package.json', JSON.stringify({ dependencies: { ioredis: '5' } }));
+    expect((await detectTechStack(dir)).database).toBe('Redis');
+  });
+
+  it('detects Supabase', async () => {
+    await write('package.json', JSON.stringify({ dependencies: { '@supabase/supabase-js': '2' } }));
+    expect((await detectTechStack(dir)).database).toBe('Supabase');
+  });
+
+  it('detects Nx as the monorepo build tool', async () => {
+    await write('package.json', JSON.stringify({ devDependencies: { nx: '19' } }));
+    expect((await detectTechStack(dir)).buildTool).toBe('Nx');
+  });
+
+  it('detects Lerna as the monorepo build tool', async () => {
+    await write('package.json', JSON.stringify({ devDependencies: { lerna: '8' } }));
+    expect((await detectTechStack(dir)).buildTool).toBe('Lerna');
+  });
+
+  it('detects GitHub Actions as the CI provider', async () => {
+    await write('package.json', JSON.stringify({ dependencies: {} }));
+    await write('.github/workflows/ci.yml', 'name: CI\non: [push]\n');
+    expect((await detectTechStack(dir)).ci).toBe('GitHub Actions');
+  });
+
+  it('detects GitLab CI as the CI provider', async () => {
+    await write('package.json', JSON.stringify({ dependencies: {} }));
+    await write('.gitlab-ci.yml', 'stages: [test]\n');
+    expect((await detectTechStack(dir)).ci).toBe('GitLab CI');
+  });
+
+  it('detects CircleCI as the CI provider', async () => {
+    await write('package.json', JSON.stringify({ dependencies: {} }));
+    await write('.circleci/config.yml', 'version: 2.1\n');
+    expect((await detectTechStack(dir)).ci).toBe('CircleCI');
+  });
 });
 
 describe('detectCommands', () => {

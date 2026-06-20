@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0]
+
+### Added
+- Database detection now covers SQLite (better-sqlite3, sqlite3, libSQL), Redis
+  (redis, ioredis) and Supabase, alongside the existing Prisma/Drizzle/Mongoose/
+  PostgreSQL/MySQL detection.
+- Monorepo tooling detection: Nx and Lerna join Turborepo in the build-tool field.
+- CI provider detection (new `ci` field): GitHub Actions, GitLab CI, CircleCI,
+  Azure Pipelines, Jenkins, Travis CI and Drone CI, surfaced in the Stack section.
+
 ## [0.9.0]
 
 ### Added
@@ -84,6 +94,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   Code, AGENTS.md, Cursor, Windsurf, Cline, Copilot, Gemini CLI, Aider, JetBrains Junie
   and Warp. Runs as a CLI or an MCP server. 100% local - no API key, no network.
 
+[0.10.0]: https://github.com/horiastanxd/claude-init/releases/tag/v0.10.0
 [0.9.0]: https://github.com/horiastanxd/claude-init/releases/tag/v0.9.0
 [0.8.0]: https://github.com/horiastanxd/claude-init/releases/tag/v0.8.0
 [0.7.0]: https://github.com/horiastanxd/claude-init/releases/tag/v0.7.0

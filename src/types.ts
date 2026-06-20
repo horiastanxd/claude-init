@@ -18,6 +18,7 @@ export interface TechStack {
   database: string | null;
   testing: string | null;
   buildTool: string | null;
+  ci?: string | null;
   extraLibraries: string[];
 }
 

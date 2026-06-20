@@ -1,12 +1,13 @@
 # @horiastanxd/claude-init
 
-One command generates AI context files - CLAUDE.md, AGENTS.md, Cursor/Windsurf/Cline rules, GEMINI.md, Copilot, Aider, Junie, Warp - for any repository. CLI + MCP server, 100% local.
+One command generates AI context files - CLAUDE.md, AGENTS.md, Cursor/Windsurf/Cline/Continue/Kilo Code/Trae rules, GEMINI.md, Copilot, Aider, Junie, Warp - for any repository. CLI + MCP server, 100% local.
 
 ## Stack
 - Language: TypeScript
 - Runtime: Node.js
 - Package manager: npm
 - Testing: Vitest
+- CI: GitHub Actions
 
 ## Commands
 ```bash
@@ -21,9 +22,15 @@ Other scripts:
 - `npm run test:watch`
 - `npm run test:coverage`
 - `npm run typecheck`
+- `npm test`
+- `npm publish --access public`
 
 ## Project structure
 ```
+assets/
+  demo.gif
+  demo.png
+  demo.tape
 src/
   analyzer/
     code-patterns.ts
@@ -33,6 +40,7 @@ src/
     index.ts
     project-structure.ts
     tech-stack.ts
+    workspaces.ts
   generators/
     agents-md.ts
     claude-md.ts
@@ -44,6 +52,8 @@ src/
     render.ts
     sections.ts
   cli.ts
+  enrich.ts
+  generate-recursive.ts
   index.ts
   mcp-server.ts
   types.ts
@@ -55,6 +65,7 @@ tests/
   cli.e2e.test.ts
   coverage-gaps.test.ts
   detection-matrix.test.ts
+  enrich.test.ts
   env-vars.test.ts
   exports.test.ts
   fallbacks.mock.test.ts
@@ -66,6 +77,9 @@ tests/
   render.test.ts
   structure-patterns.test.ts
   tech-stack.test.ts
+  workspaces.test.ts
+action.yml
+CHANGELOG.md
 CONTRIBUTING.md
 LICENSE
 package-lock.json

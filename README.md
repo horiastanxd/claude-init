@@ -200,7 +200,7 @@ Tools exposed: `analyze_project`, `generate_context_files`, `check_context_files
 
 ## What gets detected
 
-- **Stack** - language, framework, runtime, package manager, database, test runner, build tool
+- **Stack** - language, framework, runtime, package manager, database, test runner, build / monorepo tool, CI provider
 - **Commands** - install / dev / build / test / lint / format, plus other scripts, `Makefile` / `justfile` / `Taskfile` targets, and commands from `.github/workflows`
 - **Structure** - a trimmed file tree, entry points, config files
 - **Conventions** - strict mode, linter, formatter, import style, commit convention
@@ -214,6 +214,11 @@ Frameworks detected include Next.js, Remix, Astro, Angular, Gatsby, NestJS,
 Express, Fastify, Hono, SvelteKit, Nuxt, Vue, Svelte, React (JS/TS); FastAPI,
 Django, Flask (Python); Axum, Actix, Rocket (Rust); Gin, Fiber, Echo (Go);
 Spring Boot (Java); Rails, Sinatra (Ruby); and Laravel, Symfony (PHP).
+
+It also recognizes databases (PostgreSQL, MySQL, SQLite, MongoDB, Redis,
+Supabase, Prisma, Drizzle), monorepo/build tooling (Nx, Turborepo, Lerna, Vite,
+esbuild, webpack), and the CI provider (GitHub Actions, GitLab CI, CircleCI,
+Azure Pipelines, Jenkins, Travis, Drone).
 
 ## Use as a library
 
