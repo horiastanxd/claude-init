@@ -1,4 +1,4 @@
-name: 'claude-init'
+name: 'AI Context Files (claude-init)'
 description: 'Generate or check AI context files (CLAUDE.md, AGENTS.md, Cursor/Windsurf/Cline rules, GEMINI.md, Copilot, and more)'
 author: 'Horia Stan'
 branding:
