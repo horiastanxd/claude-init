@@ -16,6 +16,8 @@ npx @horiastanxd/claude-init
 [![node](https://img.shields.io/node/v/@horiastanxd/claude-init.svg?color=339933&logo=node.js)](https://nodejs.org)
 [![Glama MCP](https://glama.ai/mcp/servers/horiastanxd/claude-init/badges/score.svg)](https://glama.ai/mcp/servers/horiastanxd/claude-init)
 
+[**Website**](https://horiastanxd.github.io/claude-init/) · [npm](https://www.npmjs.com/package/@horiastanxd/claude-init) · [Changelog](./CHANGELOG.md)
+
 </div>
 
 <div align="center">
