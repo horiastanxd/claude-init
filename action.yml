@@ -31,9 +31,20 @@ runs:
   using: 'composite'
   steps:
     - shell: bash
-      run: >-
-        npx -y @horiastanxd/claude-init@"${{ inputs.version }}"
-        "${{ inputs.command }}"
-        "${{ inputs.directory }}"
-        -t "${{ inputs.targets }}"
-        ${{ inputs.args }}
+      env:
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_COMMAND: ${{ inputs.command }}
+        INPUT_DIRECTORY: ${{ inputs.directory }}
+        INPUT_TARGETS: ${{ inputs.targets }}
+        INPUT_ARGS: ${{ inputs.args }}
+      run: |
+        set -euo pipefail
+        case "$INPUT_COMMAND" in
+          check|generate) ;;
+          *) echo "claude-init: command must be 'check' or 'generate' (got '$INPUT_COMMAND')"; exit 1 ;;
+        esac
+        [[ "$INPUT_VERSION" =~ ^[A-Za-z0-9._@/-]+$ ]] || { echo "claude-init: invalid version '$INPUT_VERSION'"; exit 1; }
+        [[ "$INPUT_TARGETS" =~ ^[A-Za-z0-9,_-]+$ ]] || { echo "claude-init: invalid targets '$INPUT_TARGETS'"; exit 1; }
+        read -r -a EXTRA_ARGS <<< "$INPUT_ARGS"
+        npx -y "@horiastanxd/claude-init@${INPUT_VERSION}" \
+          "$INPUT_COMMAND" "$INPUT_DIRECTORY" -t "$INPUT_TARGETS" "${EXTRA_ARGS[@]}"
