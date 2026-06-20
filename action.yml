@@ -1,0 +1,39 @@
+name: 'claude-init'
+description: 'Generate or check AI context files (CLAUDE.md, AGENTS.md, Cursor/Windsurf/Cline rules, GEMINI.md, Copilot, and more)'
+author: 'Horia Stan'
+branding:
+  icon: 'file-text'
+  color: 'purple'
+
+inputs:
+  command:
+    description: 'Which command to run: "check" (verify files are up to date, fails on drift) or "generate"'
+    required: false
+    default: 'check'
+  directory:
+    description: 'Project directory to analyze'
+    required: false
+    default: '.'
+  targets:
+    description: 'Comma-separated target ids, or "all"'
+    required: false
+    default: 'all'
+  args:
+    description: 'Extra CLI flags passed through verbatim (e.g. "--overwrite --recurse")'
+    required: false
+    default: ''
+  version:
+    description: 'npm version or dist-tag of @horiastanxd/claude-init to run'
+    required: false
+    default: 'latest'
+
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      run: >-
+        npx -y @horiastanxd/claude-init@"${{ inputs.version }}"
+        "${{ inputs.command }}"
+        "${{ inputs.directory }}"
+        -t "${{ inputs.targets }}"
+        ${{ inputs.args }}

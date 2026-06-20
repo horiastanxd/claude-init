@@ -133,10 +133,20 @@ npx @horiastanxd/claude-init check || {
 }
 ```
 
-**GitHub Actions:**
+**GitHub Actions** - run the CLI directly:
 
 ```yaml
 - run: npx @horiastanxd/claude-init check
+```
+
+or use the action:
+
+```yaml
+- uses: horiastanxd/claude-init@v1
+  with:
+    command: check   # or "generate"
+    targets: all     # comma-separated ids, or "all"
+    # args: --overwrite --recurse
 ```
 
 ## Example output
