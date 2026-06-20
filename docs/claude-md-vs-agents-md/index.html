@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CLAUDE.md vs AGENTS.md - what's the difference, and which should you use?</title>
+<meta name="description" content="CLAUDE.md vs AGENTS.md explained: what each file is, which AI coding tools read it, how the formats differ, and when to use which. Plus how to generate both in one command." />
+<meta name="keywords" content="CLAUDE.md vs AGENTS.md, difference between CLAUDE.md and AGENTS.md, what is AGENTS.md, AGENTS.md format, CLAUDE.md format, AI context file, Claude Code, agents.md standard" />
+<meta name="author" content="Horia Stan" />
+<link rel="canonical" href="https://horiastanxd.github.io/claude-init/claude-md-vs-agents-md/" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231a1714'/%3E%3Crect x='8' y='20' width='12' height='3' fill='%23c75b39'/%3E%3Cpath d='M9 9l5 5-5 5' stroke='%23efeae0' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://horiastanxd.github.io/claude-init/claude-md-vs-agents-md/" />
+<meta property="og:title" content="CLAUDE.md vs AGENTS.md - what's the difference?" />
+<meta property="og:description" content="What each file is, which tools read it, how the formats differ, and when to use which. Plus how to generate both at once." />
+<meta property="og:image" content="https://raw.githubusercontent.com/horiastanxd/claude-init/main/assets/demo.png" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="CLAUDE.md vs AGENTS.md - what's the difference?" />
+<meta name="twitter:description" content="What each file is, which tools read it, and when to use which. Generate both in one command." />
+<meta name="twitter:image" content="https://raw.githubusercontent.com/horiastanxd/claude-init/main/assets/demo.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "CLAUDE.md vs AGENTS.md - what's the difference, and which should you use?",
+  "description": "A practical comparison of CLAUDE.md and AGENTS.md: what each file is, which AI coding tools read it, how the formats differ, and when to use which.",
+  "author": { "@type": "Person", "name": "Horia Stan" },
+  "url": "https://horiastanxd.github.io/claude-init/claude-md-vs-agents-md/",
+  "mainEntityOfPage": "https://horiastanxd.github.io/claude-init/claude-md-vs-agents-md/",
+  "about": [
+    { "@type": "Thing", "name": "CLAUDE.md" },
+    { "@type": "Thing", "name": "AGENTS.md" }
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "claude-init", "item": "https://horiastanxd.github.io/claude-init/" },
+    { "@type": "ListItem", "position": 2, "name": "CLAUDE.md vs AGENTS.md", "item": "https://horiastanxd.github.io/claude-init/claude-md-vs-agents-md/" }
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the difference between CLAUDE.md and AGENTS.md?",
+      "acceptedAnswer": { "@type": "Answer", "text": "CLAUDE.md is the project instructions file read by Claude Code. AGENTS.md is an open, cross-vendor standard read by many agents - Codex, Jules, Amp, Zed, Devin, RooCode, Factory and 20+ more. Both are plain Markdown describing your project; the difference is who reads them. CLAUDE.md is specific to Claude Code, while AGENTS.md aims to be the one file every agent understands." }
+    },
+    {
+      "@type": "Question",
+      "name": "What is AGENTS.md?",
+      "acceptedAnswer": { "@type": "Answer", "text": "AGENTS.md is an emerging open standard (agents.md) for a single Markdown file at your repository root that tells AI coding agents how to work in your project - the stack, commands, conventions and structure. A growing list of agents read it, so one file works across many tools." }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need both CLAUDE.md and AGENTS.md?",
+      "acceptedAnswer": { "@type": "Answer", "text": "If your team uses Claude Code plus any other agent, yes - keeping both means every tool gets context. They share the same content, so the cost is keeping them in sync. Tools like claude-init generate both from a single repo scan, so there is no extra maintenance." }
+    },
+    {
+      "@type": "Question",
+      "name": "Where do CLAUDE.md and AGENTS.md go?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Both live at the repository root. Both also support nested files in subdirectories or packages, where the file closest to the code being edited takes precedence - useful for monorepos." }
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --paper:   #efeae0;
+    --paper-2: #e7e1d4;
+    --ink:     #1a1714;
+    --ink-2:   #6b6258;
+    --rust:    #c75b39;
+    --rust-d:  #a8431f;
+    --line:    #d6cfbf;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans: "IBM Plex Sans", -apple-system, system-ui, sans-serif;
+    --serif: "Fraunces", Georgia, serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background-color: var(--paper);
+    background-image: radial-gradient(var(--line) 0.5px, transparent 0.5px);
+    background-size: 22px 22px;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 2; }
+  a { color: var(--rust-d); text-decoration: none; }
+  a:hover { color: var(--ink); }
+  .mono { font-family: var(--mono); }
+  .num { font-family: var(--mono); color: var(--rust); font-weight: 600; }
+
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--ink-2);
+    padding: 20px 0 16px; border-bottom: 1px solid var(--line);
+  }
+  .topbar strong { color: var(--ink); font-weight: 600; }
+  .topbar nav a { margin-left: 18px; color: var(--ink-2); }
+  .topbar nav a:hover { color: var(--rust-d); }
+
+  .crumb { font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--ink-2); padding: 18px 0 0; }
+  .crumb a { color: var(--ink-2); }
+  .crumb a:hover { color: var(--rust-d); }
+  .crumb .sep { color: var(--rust); margin: 0 8px; }
+
+  header { padding: 30px 0 48px; border-bottom: 1px solid var(--line); }
+  .kicker { font-family: var(--mono); font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--rust); margin: 0 0 20px; }
+  h1 {
+    font-family: var(--serif); font-weight: 600; font-optical-sizing: auto;
+    font-size: clamp(34px, 6vw, 60px); line-height: 1.04; letter-spacing: -0.015em;
+    margin: 0 0 22px; max-width: 18ch;
+  }
+  h1 em { font-style: italic; font-weight: 400; color: var(--rust-d); }
+  .sub { font-size: clamp(17px, 2.2vw, 19px); color: var(--ink-2); max-width: 60ch; margin: 0; }
+  .sub strong { color: var(--ink); font-weight: 500; }
+
+  section { padding: 56px 0; border-bottom: 1px solid var(--line); }
+  .shead { display: flex; align-items: baseline; gap: 16px; margin-bottom: 28px; }
+  .shead .num { font-size: 14px; }
+  .shead h2 { font-family: var(--serif); font-weight: 600; font-size: clamp(24px, 3.4vw, 34px); margin: 0; letter-spacing: -0.01em; }
+  .shead .rule { flex: 1; height: 1px; background: var(--line); align-self: center; }
+
+  p.body { color: var(--ink-2); max-width: 68ch; }
+  p.body strong { color: var(--ink); font-weight: 600; }
+  p.body code, li code { font-family: var(--mono); font-size: 13.5px; background: var(--paper-2); padding: 1px 5px; border-radius: 4px; color: var(--ink); }
+
+  /* tl;dr box */
+  .tldr { border: 1.5px solid var(--ink); border-radius: 10px; padding: 24px 26px; background: var(--paper-2); box-shadow: 6px 6px 0 rgba(26,23,20,0.10); }
+  .tldr .lab { font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rust); margin: 0 0 10px; }
+  .tldr p { margin: 0; font-size: 17px; }
+  .tldr p strong { font-weight: 600; }
+
+  /* two-card */
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); }
+  .two > div { padding: 26px; }
+  .two > div:first-child { border-right: 1px solid var(--line); }
+  .two h3 { font-family: var(--mono); font-size: 15px; color: var(--rust-d); margin: 0 0 4px; }
+  .two .who { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 14px; }
+  .two p { margin: 0; color: var(--ink-2); font-size: 15px; }
+
+  /* comparison table */
+  table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  table.cmp th, table.cmp td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.cmp thead th { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); border-bottom: 1.5px solid var(--ink); }
+  table.cmp tbody th { font-family: var(--mono); font-weight: 500; color: var(--ink-2); font-size: 13px; white-space: nowrap; width: 1%; }
+  table.cmp td { color: var(--ink-2); }
+  table.cmp td strong { color: var(--ink); font-weight: 600; }
+
+  .terminal {
+    background: var(--ink); border-radius: 10px; padding: 16px 18px;
+    font-family: var(--mono); font-size: 15px; color: var(--paper);
+    display: inline-flex; align-items: center; gap: 14px; max-width: 100%;
+    box-shadow: 6px 6px 0 var(--ink); border: 1px solid var(--ink); margin-top: 6px;
+  }
+  .terminal .p { color: var(--rust); }
+  .terminal .copy { cursor: pointer; background: transparent; border: 1px solid #4a443c; color: #b7afa2; border-radius: 5px; padding: 3px 9px; font: inherit; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .terminal .copy:hover { border-color: var(--rust); color: var(--rust); }
+  .btn { display: inline-block; font-family: var(--mono); font-size: 13.5px; letter-spacing: 0.04em; text-transform: uppercase; padding: 12px 22px; border-radius: 7px; border: 1.5px solid var(--ink); transition: transform .12s ease; margin-top: 20px; }
+  .btn.solid { background: var(--ink); color: var(--paper); }
+  .btn.solid:hover { color: var(--paper); background: var(--rust-d); border-color: var(--rust-d); transform: translateY(-2px); }
+
+  .faq .qa { padding: 22px 0; border-bottom: 1px dashed var(--line); }
+  .faq .qa:last-child { border-bottom: none; }
+  .faq .q { display: flex; gap: 14px; align-items: baseline; font-family: var(--serif); font-weight: 600; font-size: 20px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .faq .q .num { font-family: var(--mono); font-size: 13px; }
+  .faq .a { margin: 0 0 0 34px; color: var(--ink-2); font-size: 15.5px; max-width: 70ch; }
+  .faq .a code { font-family: var(--mono); font-size: 13.5px; background: var(--paper-2); padding: 1px 5px; border-radius: 4px; color: var(--ink); }
+
+  footer { padding: 40px 0 72px; font-family: var(--mono); font-size: 13px; color: var(--ink-2); letter-spacing: 0.03em; }
+  footer a { color: var(--ink); }
+  footer a:hover { color: var(--rust-d); }
+  footer .sep { color: var(--rust); margin: 0 8px; }
+
+  @media (max-width: 680px) {
+    .two { grid-template-columns: 1fr; }
+    .two > div:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+    .faq .a { margin-left: 0; }
+    table.cmp { font-size: 13.5px; }
+    .topbar nav a:first-child { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <strong>claude-init</strong>
+    <nav>
+      <a href="../">Home</a>
+      <a href="../#tools">Tools</a>
+      <a href="https://github.com/horiastanxd/claude-init">GitHub ↗</a>
+    </nav>
+  </div>
+
+  <nav class="crumb"><a href="../">claude-init</a><span class="sep">/</span>CLAUDE.md vs AGENTS.md</nav>
+
+  <header>
+    <p class="kicker">Comparison / guide</p>
+    <h1>CLAUDE.md <em>vs</em> AGENTS.md</h1>
+    <p class="sub">Two project files, almost identical content, different audiences. Here's <strong>what each one is</strong>, which tools read it, how they differ, and which you should keep.</p>
+  </header>
+
+  <section id="tldr">
+    <div class="tldr">
+      <p class="lab">Short answer</p>
+      <p>Both are plain-Markdown files at your repo root that tell AI coding agents how your project works. <strong>CLAUDE.md is read by Claude Code.</strong> <strong>AGENTS.md is an open standard</strong> read by Codex, Jules, Amp, Zed, Devin and 20+ other agents. Same content, different readers - so if you use more than one tool, keep both.</p>
+    </div>
+  </section>
+
+  <section id="what">
+    <div class="shead"><span class="num">01</span><h2>What each file is</h2><span class="rule"></span></div>
+    <div class="two">
+      <div>
+        <h3>CLAUDE.md</h3>
+        <p class="who">Read by Claude Code</p>
+        <p>Anthropic's project-memory file for Claude Code. It loads automatically when you open a repo and gives Claude your stack, commands, conventions and any house rules. Supports nested files and imports, so a monorepo can layer instructions per package.</p>
+      </div>
+      <div>
+        <h3>AGENTS.md</h3>
+        <p class="who">Read by 20+ agents</p>
+        <p>An open, vendor-neutral standard (<a href="https://agents.md">agents.md</a>) for one file that any agent can read. Codex, Jules, Amp, Zed, Devin, RooCode, Factory and others look for it - so a single AGENTS.md travels with your repo across tools.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="compare">
+    <div class="shead"><span class="num">02</span><h2>Side by side</h2><span class="rule"></span></div>
+    <table class="cmp">
+      <thead>
+        <tr><th>&nbsp;</th><th>CLAUDE.md</th><th>AGENTS.md</th></tr>
+      </thead>
+      <tbody>
+        <tr><th>Read by</th><td>Claude Code</td><td><strong>Codex, Jules, Amp, Zed, Devin, RooCode, Factory, +20</strong></td></tr>
+        <tr><th>Standard</th><td>Anthropic-specific</td><td>Open / cross-vendor</td></tr>
+        <tr><th>Format</th><td>Markdown, free-form</td><td>Markdown, free-form</td></tr>
+        <tr><th>Location</th><td>Repo root + nested</td><td>Repo root + nested</td></tr>
+        <tr><th>Precedence</th><td>Nearest file + imports</td><td>Nearest file wins</td></tr>
+        <tr><th>Best for</th><td>Claude Code users</td><td>Tool-agnostic / mixed teams</td></tr>
+      </tbody>
+    </table>
+    <p class="body" style="margin-top:20px">The formats are interchangeable in practice: both are just Markdown describing the project. The real difference is reach - <strong>CLAUDE.md targets one excellent tool, AGENTS.md targets the whole field.</strong></p>
+  </section>
+
+  <section id="which">
+    <div class="shead"><span class="num">03</span><h2>Which should you use?</h2><span class="rule"></span></div>
+    <p class="body"><strong>Use CLAUDE.md</strong> if your team is on Claude Code - it is the file Claude reads first and supports imports for layered, per-package context.</p>
+    <p class="body"><strong>Use AGENTS.md</strong> if you want one file that works no matter which agent a teammate opens - or if you are unsure which tools people will use.</p>
+    <p class="body"><strong>Use both</strong> if you mix tools, which most teams now do. The content overlaps almost entirely, so the only real cost is keeping the two in sync as your stack changes - and that part can be automated.</p>
+  </section>
+
+  <section id="generate">
+    <div class="shead"><span class="num">04</span><h2>Generate both in one command</h2><span class="rule"></span></div>
+    <p class="body"><a href="../">claude-init</a> scans your repo once - stack, scripts, structure, env vars, conventions, git - and writes CLAUDE.md, AGENTS.md and a dozen other tools' context files together, so they never drift apart. No API key, no network, 100% local.</p>
+    <span class="terminal">
+      <span class="p">$</span>
+      <span>npx @horiastanxd/claude-init</span>
+      <button class="copy" onclick="navigator.clipboard.writeText('npx @horiastanxd/claude-init');this.textContent='✓ copied'">copy</button>
+    </span>
+    <br />
+    <a class="btn solid" href="../">See how it works</a>
+  </section>
+
+  <section id="faq">
+    <div class="shead"><span class="num">05</span><h2>Questions</h2><span class="rule"></span></div>
+    <div class="faq">
+      <div class="qa">
+        <p class="q"><span class="num">Q.</span>What is the difference between CLAUDE.md and AGENTS.md?</p>
+        <p class="a">CLAUDE.md is the project instructions file read by Claude Code. AGENTS.md is an open, cross-vendor standard read by many agents - Codex, Jules, Amp, Zed, Devin, RooCode, Factory and 20+ more. Both are plain Markdown describing your project; the difference is who reads them.</p>
+      </div>
+      <div class="qa">
+        <p class="q"><span class="num">Q.</span>What is AGENTS.md?</p>
+        <p class="a">AGENTS.md is an emerging open standard (<a href="https://agents.md">agents.md</a>) for a single Markdown file at your repository root that tells AI coding agents how to work in your project - the stack, commands, conventions and structure. A growing list of agents read it, so one file works across many tools.</p>
+      </div>
+      <div class="qa">
+        <p class="q"><span class="num">Q.</span>Do I need both CLAUDE.md and AGENTS.md?</p>
+        <p class="a">If your team uses Claude Code plus any other agent, yes - keeping both means every tool gets context. They share the same content, so the cost is keeping them in sync. Tools like <a href="../">claude-init</a> generate both from a single repo scan, so there is no extra maintenance.</p>
+      </div>
+      <div class="qa">
+        <p class="q"><span class="num">Q.</span>Where do CLAUDE.md and AGENTS.md go?</p>
+        <p class="a">Both live at the repository root. Both also support nested files in subdirectories or packages, where the file closest to the code being edited takes precedence - useful for monorepos.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Free &amp; open source — MIT. Built by <a href="https://github.com/horiastanxd">Horia Stan</a>.
+    <div style="margin-top:10px">
+      <a href="../">claude-init home</a><span class="sep">/</span>
+      <a href="https://github.com/horiastanxd/claude-init">GitHub</a><span class="sep">/</span>
+      <a href="https://www.npmjs.com/package/@horiastanxd/claude-init">npm</a>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
