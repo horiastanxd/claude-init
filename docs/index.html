@@ -8,7 +8,7 @@
 <meta name="keywords" content="CLAUDE.md, AGENTS.md, cursorrules, AI context files, Cursor, Claude Code, Copilot, Gemini CLI, MCP server, code generation, developer tools" />
 <meta name="author" content="Horia Stan" />
 <link rel="canonical" href="https://horiastanxd.github.io/claude-init/" />
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231a1714'/%3E%3Crect x='8' y='20' width='12' height='3' fill='%23c75b39'/%3E%3Cpath d='M9 9l5 5-5 5' stroke='%23efeae0' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
@@ -40,147 +40,223 @@
 }
 </script>
 
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet" />
+
 <style>
   :root {
-    --bg: #0b0d12;
-    --panel: #12151c;
-    --border: #232838;
-    --text: #e6e9ef;
-    --muted: #9aa3b2;
-    --accent: #a78bfa;
-    --accent2: #7c5cff;
-    --green: #5ad17f;
-    --code: #0f1117;
+    --paper:   #efeae0;
+    --paper-2: #e7e1d4;
+    --ink:     #1a1714;
+    --ink-2:   #6b6258;
+    --rust:    #c75b39;
+    --rust-d:  #a8431f;
+    --line:    #d6cfbf;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans: "IBM Plex Sans", -apple-system, system-ui, sans-serif;
+    --serif: "Fraunces", Georgia, serif;
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
     margin: 0;
-    background: radial-gradient(1200px 600px at 50% -200px, #1a1530 0%, var(--bg) 60%);
-    color: var(--text);
-    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--paper);
+    background-image:
+      radial-gradient(var(--line) 0.5px, transparent 0.5px);
+    background-size: 22px 22px;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
   }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  .wrap { max-width: 920px; margin: 0 auto; padding: 0 20px; }
-
-  header { padding: 84px 0 40px; text-align: center; }
-  .eyebrow { color: var(--accent); font-weight: 600; letter-spacing: .04em; font-size: 14px; text-transform: uppercase; }
-  h1 { font-size: clamp(32px, 6vw, 52px); line-height: 1.1; margin: 14px 0 16px; letter-spacing: -0.02em; }
-  h1 .grad { background: linear-gradient(90deg, var(--accent), #56ccf2); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .sub { font-size: clamp(17px, 2.5vw, 21px); color: var(--muted); max-width: 660px; margin: 0 auto 28px; }
-
-  .badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 22px 0 0; }
-  .badges img { height: 20px; }
-
-  .cmd {
-    display: inline-flex; align-items: center; gap: 12px;
-    background: var(--code); border: 1px solid var(--border); border-radius: 10px;
-    padding: 14px 18px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 16px; margin: 6px 0 4px;
+  /* paper grain overlay */
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-  .cmd .dollar { color: var(--accent); }
-  .cmd code { color: var(--text); }
-  .copy { cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--muted); border-radius: 6px; padding: 4px 9px; font-size: 12px; }
-  .copy:hover { color: var(--text); }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 2; }
+  a { color: var(--rust-d); text-decoration: none; }
+  a:hover { color: var(--ink); }
 
-  .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
-  .btn { display: inline-block; padding: 11px 20px; border-radius: 9px; font-weight: 600; border: 1px solid var(--border); }
-  .btn.primary { background: linear-gradient(90deg, var(--accent2), #6a4bf0); color: #fff; border-color: transparent; }
-  .btn.primary:hover { text-decoration: none; filter: brightness(1.08); }
-  .btn.ghost { color: var(--text); }
-  .btn.ghost:hover { text-decoration: none; border-color: var(--accent); }
+  .mono { font-family: var(--mono); }
+  .num { font-family: var(--mono); color: var(--rust); font-weight: 600; }
 
-  section { padding: 44px 0; border-top: 1px solid var(--border); }
-  h2 { font-size: 26px; margin: 0 0 8px; letter-spacing: -0.01em; }
-  .lead { color: var(--muted); margin: 0 0 24px; }
+  /* top bar */
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--ink-2);
+    padding: 20px 0 16px; border-bottom: 1px solid var(--line);
+  }
+  .topbar strong { color: var(--ink); font-weight: 600; }
+  .topbar nav a { margin-left: 18px; color: var(--ink-2); }
+  .topbar nav a:hover { color: var(--rust-d); }
 
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px 18px 16px; }
-  .card h3 { margin: 0 0 6px; font-size: 17px; }
-  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  /* hero */
+  header { padding: 70px 0 52px; border-bottom: 1px solid var(--line); }
+  .kicker { font-family: var(--mono); font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--rust); margin: 0 0 22px; }
+  h1 {
+    font-family: var(--serif); font-weight: 600; font-optical-sizing: auto;
+    font-size: clamp(40px, 7.4vw, 78px); line-height: 1.02; letter-spacing: -0.015em;
+    margin: 0 0 26px; max-width: 16ch;
+  }
+  h1 em { font-style: italic; font-weight: 400; color: var(--rust-d); }
+  .sub { font-size: clamp(17px, 2.2vw, 20px); color: var(--ink-2); max-width: 56ch; margin: 0 0 36px; }
+  .sub strong { color: var(--ink); font-weight: 500; }
 
-  table { width: 100%; border-collapse: collapse; font-size: 15px; }
-  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); }
-  th { color: var(--muted); font-weight: 600; }
-  td code { color: var(--accent); font-family: ui-monospace, monospace; font-size: 13px; }
+  .terminal {
+    background: var(--ink); border-radius: 10px; padding: 16px 18px;
+    font-family: var(--mono); font-size: 15px; color: var(--paper);
+    display: inline-flex; align-items: center; gap: 14px; max-width: 100%;
+    box-shadow: 6px 6px 0 var(--ink); border: 1px solid var(--ink);
+  }
+  .terminal .p { color: var(--rust); }
+  .terminal .copy {
+    cursor: pointer; background: transparent; border: 1px solid #4a443c; color: #b7afa2;
+    border-radius: 5px; padding: 3px 9px; font: inherit; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .terminal .copy:hover { border-color: var(--rust); color: var(--rust); }
 
-  pre { background: var(--code); border: 1px solid var(--border); border-radius: 12px; padding: 18px; overflow-x: auto; font-size: 14px; }
-  pre code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: #cdd3e0; }
-  .tok { color: var(--accent); }
-  .com { color: #6b7280; }
+  .meta-row { display: flex; gap: 22px; flex-wrap: wrap; font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); margin-top: 26px; letter-spacing: 0.03em; }
+  .meta-row span b { color: var(--ink); font-weight: 600; }
+  .meta-row .dot { color: var(--rust); }
 
-  footer { text-align: center; color: var(--muted); padding: 40px 0 60px; border-top: 1px solid var(--border); font-size: 14px; }
-  .demo { width: 100%; border: 1px solid var(--border); border-radius: 12px; margin-top: 8px; }
+  .cta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 34px; }
+  .btn { font-family: var(--mono); font-size: 13.5px; letter-spacing: 0.04em; text-transform: uppercase; padding: 12px 22px; border-radius: 7px; border: 1.5px solid var(--ink); transition: transform .12s ease; }
+  .btn.solid { background: var(--ink); color: var(--paper); }
+  .btn.solid:hover { color: var(--paper); background: var(--rust-d); border-color: var(--rust-d); transform: translateY(-2px); }
+  .btn.line { color: var(--ink); }
+  .btn.line:hover { color: var(--ink); border-color: var(--rust); transform: translateY(-2px); }
+
+  /* sections */
+  section { padding: 64px 0; border-bottom: 1px solid var(--line); }
+  .shead { display: flex; align-items: baseline; gap: 16px; margin-bottom: 30px; }
+  .shead .num { font-size: 14px; }
+  .shead h2 { font-family: var(--serif); font-weight: 600; font-size: clamp(26px, 3.6vw, 38px); margin: 0; letter-spacing: -0.01em; }
+  .shead .rule { flex: 1; height: 1px; background: var(--line); align-self: center; }
+
+  .feat { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; border: 1px solid var(--line); }
+  .feat > div { padding: 26px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .feat > div:nth-child(2n) { border-right: none; }
+  .feat > div:nth-last-child(-n+2) { border-bottom: none; }
+  .feat h3 { font-family: var(--serif); font-weight: 600; font-size: 21px; margin: 0 0 8px; }
+  .feat p { margin: 0; color: var(--ink-2); font-size: 15px; }
+  .feat .ix { font-family: var(--mono); color: var(--rust); font-size: 12px; display: block; margin-bottom: 10px; letter-spacing: 0.1em; }
+
+  /* manifest table */
+  .manifest { font-family: var(--mono); font-size: 14px; }
+  .manifest .row { display: flex; align-items: baseline; padding: 9px 0; border-bottom: 1px dashed var(--line); gap: 14px; }
+  .manifest .row:last-child { border-bottom: none; }
+  .manifest .tool { color: var(--ink); white-space: nowrap; }
+  .manifest .lead { flex: 1; border-bottom: 1px dotted var(--line); transform: translateY(-4px); }
+  .manifest .file { color: var(--rust-d); white-space: nowrap; }
+
+  pre { background: var(--ink); border-radius: 10px; padding: 22px; overflow-x: auto; box-shadow: 6px 6px 0 rgba(26,23,20,0.12); }
+  pre code { font-family: var(--mono); font-size: 13.5px; color: #d8d2c6; line-height: 1.75; }
+  .com { color: #8a8275; }
+  .tok { color: #e0a081; }
+  .codecap { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); margin: 26px 0 10px; }
+
+  .detect { columns: 2; column-gap: 40px; }
+  .detect div { break-inside: avoid; margin-bottom: 18px; }
+  .detect h3 { font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rust); margin: 0 0 4px; }
+  .detect p { margin: 0; color: var(--ink-2); font-size: 14.5px; }
+
+  footer { padding: 48px 0 72px; font-family: var(--mono); font-size: 13px; color: var(--ink-2); letter-spacing: 0.03em; }
+  footer a { color: var(--ink); }
+  footer a:hover { color: var(--rust-d); }
+  footer .sep { color: var(--rust); margin: 0 8px; }
+
+  /* load reveal */
+  .reveal { opacity: 0; transform: translateY(14px); animation: rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  header .reveal:nth-child(1){animation-delay:.05s}
+  header .reveal:nth-child(2){animation-delay:.13s}
+  header .reveal:nth-child(3){animation-delay:.21s}
+  header .reveal:nth-child(4){animation-delay:.29s}
+  header .reveal:nth-child(5){animation-delay:.37s}
+  @media (prefers-reduced-motion: reduce) { .reveal { animation: none; opacity: 1; transform: none; } }
+
+  @media (max-width: 680px) {
+    .feat { grid-template-columns: 1fr; }
+    .feat > div { border-right: none !important; }
+    .detect { columns: 1; }
+    .manifest .lead { display: none; }
+    .manifest .row { justify-content: space-between; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
+  <div class="topbar">
+    <strong>claude-init</strong>
+    <nav>
+      <a href="#why">Why</a>
+      <a href="#tools">Tools</a>
+      <a href="#usage">Usage</a>
+      <a href="https://github.com/horiastanxd/claude-init">GitHub ↗</a>
+    </nav>
+  </div>
+
   <header>
-    <div class="eyebrow">CLI + MCP server &middot; 100% local</div>
-    <h1>One command generates<br /><span class="grad">AI context files</span> for every coding tool</h1>
-    <p class="sub">Every AI assistant wants its own project file in its own format. <strong>claude-init</strong> scans your repo once and writes all 13 - no API key, no network.</p>
+    <p class="kicker reveal">CLI + MCP server / 100% local</p>
+    <h1 class="reveal">Thirteen AI tools.<br /><em>One</em> source of truth.</h1>
+    <p class="sub reveal">Every coding assistant wants its own project file in its own format. <strong>claude-init</strong> scans your repo once and writes all of them - no API key, no network.</p>
 
-    <div class="cmd">
-      <span class="dollar">$</span>
-      <code id="install">npx @horiastanxd/claude-init</code>
-      <button class="copy" onclick="navigator.clipboard.writeText('npx @horiastanxd/claude-init');this.textContent='copied'">copy</button>
+    <div class="reveal">
+      <span class="terminal">
+        <span class="p">$</span>
+        <span>npx @horiastanxd/claude-init</span>
+        <button class="copy" onclick="navigator.clipboard.writeText('npx @horiastanxd/claude-init');this.textContent='✓ copied'">copy</button>
+      </span>
+      <div class="meta-row">
+        <span><b>v0.10.0</b> on npm</span><span class="dot">/</span>
+        <span><b>MIT</b> licensed</span><span class="dot">/</span>
+        <span><b>TypeScript</b></span><span class="dot">/</span>
+        <span><b>0</b> config</span>
+      </div>
+      <div class="cta">
+        <a class="btn solid" href="https://github.com/horiastanxd/claude-init">View on GitHub</a>
+        <a class="btn line" href="https://www.npmjs.com/package/@horiastanxd/claude-init">npm package ↗</a>
+      </div>
     </div>
-
-    <div class="badges">
-      <a href="https://www.npmjs.com/package/@horiastanxd/claude-init"><img alt="npm version" src="https://img.shields.io/npm/v/@horiastanxd/claude-init.svg?color=cb3837&logo=npm" /></a>
-      <a href="https://github.com/horiastanxd/claude-init/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/horiastanxd/claude-init/actions/workflows/ci.yml/badge.svg" /></a>
-      <a href="https://github.com/horiastanxd/claude-init/blob/main/LICENSE"><img alt="license" src="https://img.shields.io/npm/l/@horiastanxd/claude-init.svg?color=blue" /></a>
-      <a href="https://github.com/horiastanxd/claude-init"><img alt="GitHub stars" src="https://img.shields.io/github/stars/horiastanxd/claude-init?style=flat&logo=github&color=444" /></a>
-    </div>
-
-    <div class="cta">
-      <a class="btn primary" href="https://github.com/horiastanxd/claude-init">View on GitHub</a>
-      <a class="btn ghost" href="https://www.npmjs.com/package/@horiastanxd/claude-init">npm package</a>
-    </div>
-
-    <img class="demo" src="https://raw.githubusercontent.com/horiastanxd/claude-init/main/assets/demo.gif" alt="claude-init scanning a repo and generating AI context files" loading="lazy" />
   </header>
 
   <section id="why">
-    <h2>Why</h2>
-    <p class="lead">Keeping a dozen context files in sync by hand is busywork, and they go stale the moment your stack changes.</p>
-    <div class="grid">
-      <div class="card"><h3>One scan, every file</h3><p>Stack, scripts, structure, env vars, conventions and git - detected once, written to all 13 formats in seconds.</p></div>
-      <div class="card"><h3>100% local</h3><p>No API key, no network, nothing leaves your machine. The optional <code>--enrich</code> flag is the only exception, and it is off by default.</p></div>
-      <div class="card"><h3>Never goes stale</h3><p><code>claude-init check</code> diffs the generated files against disk and exits non-zero on drift. Drop it in CI or a pre-commit hook.</p></div>
-      <div class="card"><h3>Also an MCP server</h3><p>Run it over the Model Context Protocol so an agent can analyze a repo and write its own context files.</p></div>
+    <div class="shead"><span class="num">01</span><h2>Why it exists</h2><span class="rule"></span></div>
+    <div class="feat">
+      <div><span class="ix">A.</span><h3>One scan, every file</h3><p>Stack, scripts, structure, env vars, conventions and git - detected once, written to all 13 formats in seconds.</p></div>
+      <div><span class="ix">B.</span><h3>Stays on your machine</h3><p>No API key, no network, nothing leaves your disk. The optional <code>--enrich</code> flag is the only exception, and it's off by default.</p></div>
+      <div><span class="ix">C.</span><h3>Never goes stale</h3><p><code>claude-init check</code> diffs the generated files against disk and exits non-zero on drift. Wire it into CI or a pre-commit hook.</p></div>
+      <div><span class="ix">D.</span><h3>Speaks MCP</h3><p>Run it over the Model Context Protocol and an agent can analyze a repo and write its own context files.</p></div>
     </div>
   </section>
 
   <section id="tools">
-    <h2>13 tools, one source of truth</h2>
-    <p class="lead">Native formats for each assistant, plus the shared <a href="https://agents.md">AGENTS.md</a> standard.</p>
-    <table>
-      <thead><tr><th>Tool</th><th>File written</th></tr></thead>
-      <tbody>
-        <tr><td>Claude Code</td><td><code>CLAUDE.md</code></td></tr>
-        <tr><td>OpenAI Codex, Jules, Amp, Zed, Devin, +20</td><td><code>AGENTS.md</code></td></tr>
-        <tr><td>Cursor</td><td><code>.cursor/rules/project.mdc</code></td></tr>
-        <tr><td>Windsurf</td><td><code>.windsurf/rules/project.md</code></td></tr>
-        <tr><td>Cline, Roo Code</td><td><code>.clinerules/project.md</code></td></tr>
-        <tr><td>Continue</td><td><code>.continue/rules/project.md</code></td></tr>
-        <tr><td>Kilo Code</td><td><code>.kilocode/rules/project.md</code></td></tr>
-        <tr><td>Trae</td><td><code>.trae/rules/project_rules.md</code></td></tr>
-        <tr><td>GitHub Copilot</td><td><code>.github/copilot-instructions.md</code></td></tr>
-        <tr><td>Gemini CLI</td><td><code>GEMINI.md</code></td></tr>
-        <tr><td>Aider</td><td><code>CONVENTIONS.md</code></td></tr>
-        <tr><td>JetBrains Junie</td><td><code>.junie/guidelines.md</code></td></tr>
-        <tr><td>Warp</td><td><code>WARP.md</code></td></tr>
-      </tbody>
-    </table>
+    <div class="shead"><span class="num">02</span><h2>The manifest</h2><span class="rule"></span></div>
+    <div class="manifest">
+      <div class="row"><span class="tool">Claude Code</span><span class="lead"></span><span class="file">CLAUDE.md</span></div>
+      <div class="row"><span class="tool">Codex · Jules · Amp · Zed · Devin · +20</span><span class="lead"></span><span class="file">AGENTS.md</span></div>
+      <div class="row"><span class="tool">Cursor</span><span class="lead"></span><span class="file">.cursor/rules/project.mdc</span></div>
+      <div class="row"><span class="tool">Windsurf</span><span class="lead"></span><span class="file">.windsurf/rules/project.md</span></div>
+      <div class="row"><span class="tool">Cline · Roo Code</span><span class="lead"></span><span class="file">.clinerules/project.md</span></div>
+      <div class="row"><span class="tool">Continue</span><span class="lead"></span><span class="file">.continue/rules/project.md</span></div>
+      <div class="row"><span class="tool">Kilo Code</span><span class="lead"></span><span class="file">.kilocode/rules/project.md</span></div>
+      <div class="row"><span class="tool">Trae</span><span class="lead"></span><span class="file">.trae/rules/project_rules.md</span></div>
+      <div class="row"><span class="tool">GitHub Copilot</span><span class="lead"></span><span class="file">.github/copilot-instructions.md</span></div>
+      <div class="row"><span class="tool">Gemini CLI</span><span class="lead"></span><span class="file">GEMINI.md</span></div>
+      <div class="row"><span class="tool">Aider</span><span class="lead"></span><span class="file">CONVENTIONS.md</span></div>
+      <div class="row"><span class="tool">JetBrains Junie</span><span class="lead"></span><span class="file">.junie/guidelines.md</span></div>
+      <div class="row"><span class="tool">Warp</span><span class="lead"></span><span class="file">WARP.md</span></div>
+    </div>
   </section>
 
   <section id="usage">
-    <h2>Usage</h2>
-    <p class="lead">Zero config. Point it at a repo and go.</p>
+    <div class="shead"><span class="num">03</span><h2>Usage</h2><span class="rule"></span></div>
+    <p class="codecap">// command line</p>
 <pre><code><span class="com"># generate everything in the current repo</span>
 npx @horiastanxd/claude-init
 
@@ -192,7 +268,7 @@ npx @horiastanxd/claude-init check
 
 <span class="com"># monorepo: generate into each workspace package too</span>
 npx @horiastanxd/claude-init <span class="tok">--recurse</span></code></pre>
-    <p class="lead" style="margin-top:20px">In CI with the action:</p>
+    <p class="codecap">// github action</p>
 <pre><code><span class="tok">- uses:</span> horiastanxd/claude-init@v1
   <span class="tok">with:</span>
     command: check
@@ -200,18 +276,22 @@ npx @horiastanxd/claude-init <span class="tok">--recurse</span></code></pre>
   </section>
 
   <section id="detects">
-    <h2>What it detects</h2>
-    <div class="grid">
-      <div class="card"><h3>Stack</h3><p>Language, framework, runtime, package manager, database, test runner, build / monorepo tool, CI provider.</p></div>
-      <div class="card"><h3>Languages</h3><p>JS/TS (npm, pnpm, yarn, bun), Python (pip, uv, poetry), Rust, Go, Java (Maven, Gradle), Ruby, PHP.</p></div>
-      <div class="card"><h3>Frameworks</h3><p>Next.js, Remix, Astro, Angular, NestJS, SvelteKit, Nuxt, Vue, React, FastAPI, Django, Rails, Laravel, Spring Boot, and more.</p></div>
-      <div class="card"><h3>Conventions</h3><p>Strict mode, linter, formatter, import style, commit convention, env vars from <code>.env.example</code>, git authors and hot files.</p></div>
+    <div class="shead"><span class="num">04</span><h2>What it reads</h2><span class="rule"></span></div>
+    <div class="detect">
+      <div><h3>Stack</h3><p>Language, framework, runtime, package manager, database, test runner, build / monorepo tool, CI provider.</p></div>
+      <div><h3>Languages</h3><p>JS/TS (npm, pnpm, yarn, bun), Python (pip, uv, poetry), Rust, Go, Java, Ruby, PHP.</p></div>
+      <div><h3>Frameworks</h3><p>Next.js, Remix, Astro, Angular, SvelteKit, Nuxt, Vue, React, FastAPI, Django, Rails, Laravel, Spring Boot, and more.</p></div>
+      <div><h3>Conventions</h3><p>Strict mode, linter, formatter, import style, commit convention, env vars, git authors and hot files.</p></div>
     </div>
   </section>
 
   <footer>
-    <p>Free and open source under the <a href="https://github.com/horiastanxd/claude-init/blob/main/LICENSE">MIT license</a>. Built by <a href="https://github.com/horiastanxd">Horia Stan</a>.</p>
-    <p><a href="https://github.com/horiastanxd/claude-init">GitHub</a> &middot; <a href="https://www.npmjs.com/package/@horiastanxd/claude-init">npm</a> &middot; <a href="https://glama.ai/mcp/servers/horiastanxd/claude-init">Glama</a></p>
+    Free &amp; open source — MIT. Built by <a href="https://github.com/horiastanxd">Horia Stan</a>.
+    <div style="margin-top:10px">
+      <a href="https://github.com/horiastanxd/claude-init">GitHub</a><span class="sep">/</span>
+      <a href="https://www.npmjs.com/package/@horiastanxd/claude-init">npm</a><span class="sep">/</span>
+      <a href="https://glama.ai/mcp/servers/horiastanxd/claude-init">Glama</a>
+    </div>
   </footer>
 
 </div>
