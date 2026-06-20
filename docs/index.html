@@ -40,6 +40,50 @@
 }
 </script>
 
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is claude-init?",
+      "acceptedAnswer": { "@type": "Answer", "text": "claude-init is one command that scans a repository and generates AI context files - CLAUDE.md, AGENTS.md, Cursor, Windsurf, Cline, Continue, Kilo Code, Trae, Copilot, GEMINI.md, Aider, Junie and Warp - for every major coding assistant. It runs as a CLI or an MCP server, 100% local." }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I generate a CLAUDE.md file?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Run npx @horiastanxd/claude-init in your project. It detects your stack, scripts, structure and conventions, then writes CLAUDE.md alongside every other tool's context file. No config and no API key required." }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between CLAUDE.md and AGENTS.md?",
+      "acceptedAnswer": { "@type": "Answer", "text": "CLAUDE.md is read by Claude Code. AGENTS.md is an emerging shared standard read by Codex, Jules, Amp, Zed, Devin and 20+ other agents. claude-init writes both, so your project is covered whichever tool you use." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does claude-init send my code anywhere?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. It runs entirely on your machine - no API key and no network. The only exception is the optional --enrich flag, which uses an LLM to sharpen the description and is off by default." }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I keep AI context files up to date?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Run claude-init check in CI or a pre-commit hook. It regenerates the files in memory, diffs them against what is on disk, and exits non-zero on drift so stale context fails the build." }
+    },
+    {
+      "@type": "Question",
+      "name": "Which languages and frameworks does claude-init detect?",
+      "acceptedAnswer": { "@type": "Answer", "text": "JavaScript/TypeScript, Deno, Python, Rust, Go, Java/Kotlin, C#/.NET, Elixir, Dart, Ruby and PHP - with frameworks including Next.js, Astro, FastAPI, Django, Rails, Laravel, Spring Boot, ASP.NET Core, Phoenix and Flutter." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is claude-init free?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. claude-init is free and open source under the MIT license." }
+    }
+  ]
+}
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet" />
@@ -164,6 +208,15 @@
   .detect h3 { font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rust); margin: 0 0 4px; }
   .detect p { margin: 0; color: var(--ink-2); font-size: 14.5px; }
 
+  /* faq */
+  .faq .qa { padding: 22px 0; border-bottom: 1px dashed var(--line); }
+  .faq .qa:last-child { border-bottom: none; }
+  .faq .q { display: flex; gap: 14px; align-items: baseline; font-family: var(--serif); font-weight: 600; font-size: 20px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .faq .q .num { font-family: var(--mono); font-size: 13px; }
+  .faq .a { margin: 0 0 0 34px; color: var(--ink-2); font-size: 15.5px; max-width: 70ch; }
+  .faq .a code { font-family: var(--mono); font-size: 13.5px; background: var(--paper-2); padding: 1px 5px; border-radius: 4px; color: var(--ink); }
+  @media (max-width: 680px) { .faq .a { margin-left: 0; } }
+
   footer { padding: 48px 0 72px; font-family: var(--mono); font-size: 13px; color: var(--ink-2); letter-spacing: 0.03em; }
   footer a { color: var(--ink); }
   footer a:hover { color: var(--rust-d); }
@@ -197,6 +250,7 @@
       <a href="#why">Why</a>
       <a href="#tools">Tools</a>
       <a href="#usage">Usage</a>
+      <a href="#faq">FAQ</a>
       <a href="https://github.com/horiastanxd/claude-init">GitHub ↗</a>
     </nav>
   </div>
@@ -213,7 +267,7 @@
         <button class="copy" onclick="navigator.clipboard.writeText('npx @horiastanxd/claude-init');this.textContent='✓ copied'">copy</button>
       </span>
       <div class="meta-row">
-        <span><b>v0.10.0</b> on npm</span><span class="dot">/</span>
+        <span><b>v0.11.0</b> on npm</span><span class="dot">/</span>
         <span><b>MIT</b> licensed</span><span class="dot">/</span>
         <span><b>TypeScript</b></span><span class="dot">/</span>
         <span><b>0</b> config</span>
@@ -279,9 +333,43 @@ npx @horiastanxd/claude-init <span class="tok">--recurse</span></code></pre>
     <div class="shead"><span class="num">04</span><h2>What it reads</h2><span class="rule"></span></div>
     <div class="detect">
       <div><h3>Stack</h3><p>Language, framework, runtime, package manager, database, test runner, build / monorepo tool, CI provider.</p></div>
-      <div><h3>Languages</h3><p>JS/TS (npm, pnpm, yarn, bun), Python (pip, uv, poetry), Rust, Go, Java, Ruby, PHP.</p></div>
-      <div><h3>Frameworks</h3><p>Next.js, Remix, Astro, Angular, SvelteKit, Nuxt, Vue, React, FastAPI, Django, Rails, Laravel, Spring Boot, and more.</p></div>
+      <div><h3>Languages</h3><p>JS/TS (npm, pnpm, yarn, bun), Deno, Python (pip, uv, poetry), Rust, Go, Java/Kotlin, C#/.NET, Elixir, Dart, Ruby, PHP.</p></div>
+      <div><h3>Frameworks</h3><p>Next.js, Remix, Astro, Angular, SvelteKit, Nuxt, Vue, React, Fresh, FastAPI, Django, Rails, Laravel, Spring Boot, ASP.NET Core, Phoenix, Flutter, and more.</p></div>
       <div><h3>Conventions</h3><p>Strict mode, linter, formatter, import style, commit convention, env vars, git authors and hot files.</p></div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="shead"><span class="num">05</span><h2>Questions</h2><span class="rule"></span></div>
+    <div class="faq">
+      <div class="qa">
+        <p class="q"><span class="num">Q.</span>What is claude-init?</p>
+        <p class="a">One command that scans a repository and generates AI context files - CLAUDE.md, AGENTS.md, Cursor, Windsurf, Cline, Continue, Kilo Code, Trae, Copilot, GEMINI.md, Aider, Junie and Warp - for every major coding assistant. It runs as a CLI or an MCP server, 100% local.</p>
+      </div>
+      <div class="qa">
+        <p class="q"><span class="num">Q.</span>How do I generate a CLAUDE.md file?</p>
+        <p class="a">Run <code>npx @horiastanxd/claude-init</code> in your project. It detects your stack, scripts, structure and conventions, then writes CLAUDE.md alongside every other tool's context file. No config and no API key required.</p>
+      </div>
+      <div class="qa">
+        <p class="q"><span class="num">Q.</span>What is the difference between CLAUDE.md and AGENTS.md?</p>
+        <p class="a">CLAUDE.md is read by Claude Code. AGENTS.md is an emerging shared standard read by Codex, Jules, Amp, Zed, Devin and 20+ other agents. claude-init writes both, so your project is covered whichever tool you use.</p>
+      </div>
+      <div class="qa">
+        <p class="q"><span class="num">Q.</span>Does claude-init send my code anywhere?</p>
+        <p class="a">No. It runs entirely on your machine - no API key and no network. The only exception is the optional <code>--enrich</code> flag, which uses an LLM to sharpen the description and is off by default.</p>
+      </div>
+      <div class="qa">
+        <p class="q"><span class="num">Q.</span>How do I keep AI context files up to date?</p>
+        <p class="a">Run <code>claude-init check</code> in CI or a pre-commit hook. It regenerates the files in memory, diffs them against what is on disk, and exits non-zero on drift so stale context fails the build.</p>
+      </div>
+      <div class="qa">
+        <p class="q"><span class="num">Q.</span>Which languages and frameworks does claude-init detect?</p>
+        <p class="a">JavaScript/TypeScript, Deno, Python, Rust, Go, Java/Kotlin, C#/.NET, Elixir, Dart, Ruby and PHP - with frameworks including Next.js, Astro, FastAPI, Django, Rails, Laravel, Spring Boot, ASP.NET Core, Phoenix and Flutter.</p>
+      </div>
+      <div class="qa">
+        <p class="q"><span class="num">Q.</span>Is claude-init free?</p>
+        <p class="a">Yes. claude-init is free and open source under the MIT license.</p>
+      </div>
     </div>
   </section>
 
