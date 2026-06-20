@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>claude-init - Generate AI context files for 13 coding assistants, in one command</title>
+<meta name="description" content="One command scans your repo and generates CLAUDE.md, AGENTS.md, Cursor, Windsurf, Cline, Continue, Kilo Code, Trae, Copilot, GEMINI.md, Aider, Junie and Warp context files. CLI + MCP server. 100% local, no API key." />
+<meta name="keywords" content="CLAUDE.md, AGENTS.md, cursorrules, AI context files, Cursor, Claude Code, Copilot, Gemini CLI, MCP server, code generation, developer tools" />
+<meta name="author" content="Horia Stan" />
+<link rel="canonical" href="https://horiastanxd.github.io/claude-init/" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://horiastanxd.github.io/claude-init/" />
+<meta property="og:title" content="claude-init - one command for 13 AI coding-assistant context files" />
+<meta property="og:description" content="Scan your repo once and generate CLAUDE.md, AGENTS.md, Cursor/Windsurf/Cline rules, GEMINI.md, Copilot, Aider, Junie, Warp and more. CLI + MCP server, 100% local." />
+<meta property="og:image" content="https://raw.githubusercontent.com/horiastanxd/claude-init/main/assets/demo.png" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="claude-init - one command for 13 AI coding-assistant context files" />
+<meta name="twitter:description" content="Scan your repo once and generate every AI coding tool's context file. CLI + MCP server, 100% local." />
+<meta name="twitter:image" content="https://raw.githubusercontent.com/horiastanxd/claude-init/main/assets/demo.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "claude-init",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Linux, macOS, Windows",
+  "description": "One command scans a repository and generates AI context files (CLAUDE.md, AGENTS.md, Cursor, Windsurf, Cline, Continue, Kilo Code, Trae, Copilot, GEMINI.md, Aider, Junie, Warp). Runs as a CLI or an MCP server, 100% local.",
+  "url": "https://horiastanxd.github.io/claude-init/",
+  "downloadUrl": "https://www.npmjs.com/package/@horiastanxd/claude-init",
+  "codeRepository": "https://github.com/horiastanxd/claude-init",
+  "license": "https://opensource.org/licenses/MIT",
+  "author": { "@type": "Person", "name": "Horia Stan" },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+
+<style>
+  :root {
+    --bg: #0b0d12;
+    --panel: #12151c;
+    --border: #232838;
+    --text: #e6e9ef;
+    --muted: #9aa3b2;
+    --accent: #a78bfa;
+    --accent2: #7c5cff;
+    --green: #5ad17f;
+    --code: #0f1117;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: radial-gradient(1200px 600px at 50% -200px, #1a1530 0%, var(--bg) 60%);
+    color: var(--text);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 20px; }
+
+  header { padding: 84px 0 40px; text-align: center; }
+  .eyebrow { color: var(--accent); font-weight: 600; letter-spacing: .04em; font-size: 14px; text-transform: uppercase; }
+  h1 { font-size: clamp(32px, 6vw, 52px); line-height: 1.1; margin: 14px 0 16px; letter-spacing: -0.02em; }
+  h1 .grad { background: linear-gradient(90deg, var(--accent), #56ccf2); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { font-size: clamp(17px, 2.5vw, 21px); color: var(--muted); max-width: 660px; margin: 0 auto 28px; }
+
+  .badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 22px 0 0; }
+  .badges img { height: 20px; }
+
+  .cmd {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--code); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 18px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 16px; margin: 6px 0 4px;
+  }
+  .cmd .dollar { color: var(--accent); }
+  .cmd code { color: var(--text); }
+  .copy { cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--muted); border-radius: 6px; padding: 4px 9px; font-size: 12px; }
+  .copy:hover { color: var(--text); }
+
+  .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
+  .btn { display: inline-block; padding: 11px 20px; border-radius: 9px; font-weight: 600; border: 1px solid var(--border); }
+  .btn.primary { background: linear-gradient(90deg, var(--accent2), #6a4bf0); color: #fff; border-color: transparent; }
+  .btn.primary:hover { text-decoration: none; filter: brightness(1.08); }
+  .btn.ghost { color: var(--text); }
+  .btn.ghost:hover { text-decoration: none; border-color: var(--accent); }
+
+  section { padding: 44px 0; border-top: 1px solid var(--border); }
+  h2 { font-size: 26px; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .lead { color: var(--muted); margin: 0 0 24px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px 18px 16px; }
+  .card h3 { margin: 0 0 6px; font-size: 17px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; }
+  td code { color: var(--accent); font-family: ui-monospace, monospace; font-size: 13px; }
+
+  pre { background: var(--code); border: 1px solid var(--border); border-radius: 12px; padding: 18px; overflow-x: auto; font-size: 14px; }
+  pre code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: #cdd3e0; }
+  .tok { color: var(--accent); }
+  .com { color: #6b7280; }
+
+  footer { text-align: center; color: var(--muted); padding: 40px 0 60px; border-top: 1px solid var(--border); font-size: 14px; }
+  .demo { width: 100%; border: 1px solid var(--border); border-radius: 12px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">CLI + MCP server &middot; 100% local</div>
+    <h1>One command generates<br /><span class="grad">AI context files</span> for every coding tool</h1>
+    <p class="sub">Every AI assistant wants its own project file in its own format. <strong>claude-init</strong> scans your repo once and writes all 13 - no API key, no network.</p>
+
+    <div class="cmd">
+      <span class="dollar">$</span>
+      <code id="install">npx @horiastanxd/claude-init</code>
+      <button class="copy" onclick="navigator.clipboard.writeText('npx @horiastanxd/claude-init');this.textContent='copied'">copy</button>
+    </div>
+
+    <div class="badges">
+      <a href="https://www.npmjs.com/package/@horiastanxd/claude-init"><img alt="npm version" src="https://img.shields.io/npm/v/@horiastanxd/claude-init.svg?color=cb3837&logo=npm" /></a>
+      <a href="https://github.com/horiastanxd/claude-init/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/horiastanxd/claude-init/actions/workflows/ci.yml/badge.svg" /></a>
+      <a href="https://github.com/horiastanxd/claude-init/blob/main/LICENSE"><img alt="license" src="https://img.shields.io/npm/l/@horiastanxd/claude-init.svg?color=blue" /></a>
+      <a href="https://github.com/horiastanxd/claude-init"><img alt="GitHub stars" src="https://img.shields.io/github/stars/horiastanxd/claude-init?style=flat&logo=github&color=444" /></a>
+    </div>
+
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/horiastanxd/claude-init">View on GitHub</a>
+      <a class="btn ghost" href="https://www.npmjs.com/package/@horiastanxd/claude-init">npm package</a>
+    </div>
+
+    <img class="demo" src="https://raw.githubusercontent.com/horiastanxd/claude-init/main/assets/demo.gif" alt="claude-init scanning a repo and generating AI context files" loading="lazy" />
+  </header>
+
+  <section id="why">
+    <h2>Why</h2>
+    <p class="lead">Keeping a dozen context files in sync by hand is busywork, and they go stale the moment your stack changes.</p>
+    <div class="grid">
+      <div class="card"><h3>One scan, every file</h3><p>Stack, scripts, structure, env vars, conventions and git - detected once, written to all 13 formats in seconds.</p></div>
+      <div class="card"><h3>100% local</h3><p>No API key, no network, nothing leaves your machine. The optional <code>--enrich</code> flag is the only exception, and it is off by default.</p></div>
+      <div class="card"><h3>Never goes stale</h3><p><code>claude-init check</code> diffs the generated files against disk and exits non-zero on drift. Drop it in CI or a pre-commit hook.</p></div>
+      <div class="card"><h3>Also an MCP server</h3><p>Run it over the Model Context Protocol so an agent can analyze a repo and write its own context files.</p></div>
+    </div>
+  </section>
+
+  <section id="tools">
+    <h2>13 tools, one source of truth</h2>
+    <p class="lead">Native formats for each assistant, plus the shared <a href="https://agents.md">AGENTS.md</a> standard.</p>
+    <table>
+      <thead><tr><th>Tool</th><th>File written</th></tr></thead>
+      <tbody>
+        <tr><td>Claude Code</td><td><code>CLAUDE.md</code></td></tr>
+        <tr><td>OpenAI Codex, Jules, Amp, Zed, Devin, +20</td><td><code>AGENTS.md</code></td></tr>
+        <tr><td>Cursor</td><td><code>.cursor/rules/project.mdc</code></td></tr>
+        <tr><td>Windsurf</td><td><code>.windsurf/rules/project.md</code></td></tr>
+        <tr><td>Cline, Roo Code</td><td><code>.clinerules/project.md</code></td></tr>
+        <tr><td>Continue</td><td><code>.continue/rules/project.md</code></td></tr>
+        <tr><td>Kilo Code</td><td><code>.kilocode/rules/project.md</code></td></tr>
+        <tr><td>Trae</td><td><code>.trae/rules/project_rules.md</code></td></tr>
+        <tr><td>GitHub Copilot</td><td><code>.github/copilot-instructions.md</code></td></tr>
+        <tr><td>Gemini CLI</td><td><code>GEMINI.md</code></td></tr>
+        <tr><td>Aider</td><td><code>CONVENTIONS.md</code></td></tr>
+        <tr><td>JetBrains Junie</td><td><code>.junie/guidelines.md</code></td></tr>
+        <tr><td>Warp</td><td><code>WARP.md</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="usage">
+    <h2>Usage</h2>
+    <p class="lead">Zero config. Point it at a repo and go.</p>
+<pre><code><span class="com"># generate everything in the current repo</span>
+npx @horiastanxd/claude-init
+
+<span class="com"># only specific tools</span>
+npx @horiastanxd/claude-init <span class="tok">-t</span> claude,cursor
+
+<span class="com"># verify files are up to date (CI / pre-commit)</span>
+npx @horiastanxd/claude-init check
+
+<span class="com"># monorepo: generate into each workspace package too</span>
+npx @horiastanxd/claude-init <span class="tok">--recurse</span></code></pre>
+    <p class="lead" style="margin-top:20px">In CI with the action:</p>
+<pre><code><span class="tok">- uses:</span> horiastanxd/claude-init@v1
+  <span class="tok">with:</span>
+    command: check
+    targets: all</code></pre>
+  </section>
+
+  <section id="detects">
+    <h2>What it detects</h2>
+    <div class="grid">
+      <div class="card"><h3>Stack</h3><p>Language, framework, runtime, package manager, database, test runner, build / monorepo tool, CI provider.</p></div>
+      <div class="card"><h3>Languages</h3><p>JS/TS (npm, pnpm, yarn, bun), Python (pip, uv, poetry), Rust, Go, Java (Maven, Gradle), Ruby, PHP.</p></div>
+      <div class="card"><h3>Frameworks</h3><p>Next.js, Remix, Astro, Angular, NestJS, SvelteKit, Nuxt, Vue, React, FastAPI, Django, Rails, Laravel, Spring Boot, and more.</p></div>
+      <div class="card"><h3>Conventions</h3><p>Strict mode, linter, formatter, import style, commit convention, env vars from <code>.env.example</code>, git authors and hot files.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Free and open source under the <a href="https://github.com/horiastanxd/claude-init/blob/main/LICENSE">MIT license</a>. Built by <a href="https://github.com/horiastanxd">Horia Stan</a>.</p>
+    <p><a href="https://github.com/horiastanxd/claude-init">GitHub</a> &middot; <a href="https://www.npmjs.com/package/@horiastanxd/claude-init">npm</a> &middot; <a href="https://glama.ai/mcp/servers/horiastanxd/claude-init">Glama</a></p>
+  </footer>
+
+</div>
+</body>
+</html>
