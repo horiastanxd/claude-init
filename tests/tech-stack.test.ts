@@ -66,6 +66,48 @@ describe('detectTechStack', () => {
     const t = await detectTechStack(dir);
     expect(t).toMatchObject({ language: 'Go', framework: 'Gin' });
   });
+
+  it('detects Astro', async () => {
+    await write('package.json', JSON.stringify({ dependencies: { astro: '4', react: '18' } }));
+    const t = await detectTechStack(dir);
+    expect(t.framework).toBe('Astro');
+  });
+
+  it('detects Angular', async () => {
+    await write('package.json', JSON.stringify({ dependencies: { '@angular/core': '17' } }));
+    const t = await detectTechStack(dir);
+    expect(t.framework).toBe('Angular');
+  });
+
+  it('detects Python framework and pytest from requirements.txt', async () => {
+    await write('requirements.txt', 'django==5.0\npytest==8.0\n');
+    const t = await detectTechStack(dir);
+    expect(t).toMatchObject({ language: 'Python', framework: 'Django', testing: 'pytest', packageManager: 'pip' });
+  });
+
+  it('detects Ruby on Rails and RSpec from Gemfile', async () => {
+    await write('Gemfile', 'source "https://rubygems.org"\ngem "rails", "~> 7.1"\ngem "rspec-rails"\n');
+    const t = await detectTechStack(dir);
+    expect(t).toMatchObject({ language: 'Ruby', framework: 'Rails', testing: 'RSpec' });
+  });
+
+  it('detects PHP Laravel and PHPUnit from composer.json', async () => {
+    await write(
+      'composer.json',
+      JSON.stringify({ require: { 'laravel/framework': '^11.0' }, 'require-dev': { 'phpunit/phpunit': '^11.0' } }),
+    );
+    const t = await detectTechStack(dir);
+    expect(t).toMatchObject({ language: 'PHP', framework: 'Laravel', testing: 'PHPUnit' });
+  });
+
+  it('detects Java Spring Boot from pom.xml', async () => {
+    await write(
+      'pom.xml',
+      '<project><dependencies><dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-web</artifactId></dependency></dependencies></project>',
+    );
+    const t = await detectTechStack(dir);
+    expect(t).toMatchObject({ language: 'Java', framework: 'Spring Boot' });
+  });
 });
 
 describe('detectCommands', () => {

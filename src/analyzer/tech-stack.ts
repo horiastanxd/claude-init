@@ -19,11 +19,11 @@ export async function detectTechStack(projectDir: string): Promise<TechStack> {
     ['Cargo.toml', parseCargoToml],
     ['go.mod', parseGoMod],
     ['pyproject.toml', parsePyproject],
-    ['requirements.txt', async () => ({ language: 'Python', packageManager: 'pip' })],
-    ['pom.xml', async () => ({ language: 'Java', packageManager: 'maven' })],
-    ['build.gradle', async () => ({ language: 'Java/Kotlin', packageManager: 'gradle' })],
-    ['Gemfile', async () => ({ language: 'Ruby', packageManager: 'bundler' })],
-    ['composer.json', async () => ({ language: 'PHP', packageManager: 'composer' })],
+    ['requirements.txt', parseRequirementsTxt],
+    ['pom.xml', parsePomXml],
+    ['build.gradle', parseGradle],
+    ['Gemfile', parseGemfile],
+    ['composer.json', parseComposerJson],
   ];
 
   for (const [file, parser] of manifest) {
@@ -53,6 +53,9 @@ async function parsePackageJson(dir: string): Promise<Partial<TechStack>> {
 
   if (has('next')) result.framework = 'Next.js';
   else if (has('@remix-run/node') || has('@remix-run/react')) result.framework = 'Remix';
+  else if (has('astro')) result.framework = 'Astro';
+  else if (has('@angular/core')) result.framework = 'Angular';
+  else if (has('gatsby')) result.framework = 'Gatsby';
   else if (has('@nestjs/core')) result.framework = 'NestJS';
   else if (has('express')) result.framework = 'Express';
   else if (has('fastify')) result.framework = 'Fastify';
@@ -123,13 +126,77 @@ async function parsePyproject(dir: string): Promise<Partial<TechStack>> {
   return {
     language: 'Python',
     packageManager: hasUv ? 'uv' : hasPoetry ? 'poetry' : 'pip',
-    framework: content.includes('fastapi')
-      ? 'FastAPI'
-      : content.includes('django')
-        ? 'Django'
-        : content.includes('flask')
-          ? 'Flask'
-          : null,
+    framework: pythonFramework(content),
     testing: content.includes('pytest') ? 'pytest' : null,
+  };
+}
+
+async function parseRequirementsTxt(dir: string): Promise<Partial<TechStack>> {
+  const content = ((await readText(join(dir, 'requirements.txt'))) ?? '').toLowerCase();
+  return {
+    language: 'Python',
+    packageManager: 'pip',
+    framework: pythonFramework(content),
+    testing: content.includes('pytest') ? 'pytest' : null,
+  };
+}
+
+function pythonFramework(content: string): string | null {
+  const c = content.toLowerCase();
+  if (c.includes('fastapi')) return 'FastAPI';
+  if (c.includes('django')) return 'Django';
+  if (c.includes('flask')) return 'Flask';
+  return null;
+}
+
+async function parsePomXml(dir: string): Promise<Partial<TechStack>> {
+  const content = (await readText(join(dir, 'pom.xml'))) ?? '';
+  return {
+    language: 'Java',
+    packageManager: 'maven',
+    framework: content.includes('spring-boot') ? 'Spring Boot' : null,
+  };
+}
+
+async function parseGradle(dir: string): Promise<Partial<TechStack>> {
+  const content = (await readText(join(dir, 'build.gradle'))) ?? '';
+  return {
+    language: 'Java/Kotlin',
+    packageManager: 'gradle',
+    framework: content.includes('spring-boot') ? 'Spring Boot' : null,
+  };
+}
+
+async function parseGemfile(dir: string): Promise<Partial<TechStack>> {
+  const content = ((await readText(join(dir, 'Gemfile'))) ?? '').toLowerCase();
+  return {
+    language: 'Ruby',
+    packageManager: 'bundler',
+    framework: content.includes('rails')
+      ? 'Rails'
+      : content.includes('sinatra')
+        ? 'Sinatra'
+        : null,
+    testing: content.includes('rspec') ? 'RSpec' : content.includes('minitest') ? 'Minitest' : null,
+  };
+}
+
+async function parseComposerJson(dir: string): Promise<Partial<TechStack>> {
+  const pkg = await readJson<{
+    require?: Record<string, string>;
+    'require-dev'?: Record<string, string>;
+  }>(join(dir, 'composer.json'));
+  const deps = { ...pkg?.require, ...pkg?.['require-dev'] };
+  const has = (name: string) => name in deps;
+  const hasPrefix = (prefix: string) => Object.keys(deps).some((k) => k.startsWith(prefix));
+  return {
+    language: 'PHP',
+    packageManager: 'composer',
+    framework: has('laravel/framework')
+      ? 'Laravel'
+      : hasPrefix('symfony/')
+        ? 'Symfony'
+        : null,
+    testing: has('phpunit/phpunit') ? 'PHPUnit' : has('pestphp/pest') ? 'Pest' : null,
   };
 }

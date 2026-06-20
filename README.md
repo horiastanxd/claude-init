@@ -210,6 +210,11 @@ Tools exposed: `analyze_project`, `generate_context_files`, `check_context_files
 Languages: JS/TS (npm, pnpm, yarn, bun), Python (pip, uv, poetry), Rust (cargo),
 Go (modules), Java (Maven, Gradle), Ruby (Bundler), and PHP (Composer).
 
+Frameworks detected include Next.js, Remix, Astro, Angular, Gatsby, NestJS,
+Express, Fastify, Hono, SvelteKit, Nuxt, Vue, Svelte, React (JS/TS); FastAPI,
+Django, Flask (Python); Axum, Actix, Rocket (Rust); Gin, Fiber, Echo (Go);
+Spring Boot (Java); Rails, Sinatra (Ruby); and Laravel, Symfony (PHP).
+
 ## Use as a library
 
 ```ts
