@@ -33,6 +33,10 @@ assets/
   demo.gif
   demo.png
   demo.tape
+docs/
+  index.html
+  robots.txt
+  sitemap.xml
 src/
   analyzer/
     code-patterns.ts

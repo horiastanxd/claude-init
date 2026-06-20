@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+import { readdir } from 'node:fs/promises';
 import { pathExists, readJson, readText, detectPackageManager } from '../utils.js';
 import type { TechStack } from '../types.js';
 
@@ -16,12 +17,17 @@ const EMPTY: TechStack = {
 export async function detectTechStack(projectDir: string): Promise<TechStack> {
   const manifest: Array<[string, (dir: string) => Promise<Partial<TechStack>>]> = [
     ['package.json', parsePackageJson],
+    ['deno.json', parseDenoJson],
+    ['deno.jsonc', parseDenoJson],
     ['Cargo.toml', parseCargoToml],
     ['go.mod', parseGoMod],
     ['pyproject.toml', parsePyproject],
     ['requirements.txt', parseRequirementsTxt],
     ['pom.xml', parsePomXml],
     ['build.gradle', parseGradle],
+    ['build.gradle.kts', parseGradleKts],
+    ['mix.exs', parseMixExs],
+    ['pubspec.yaml', parsePubspec],
     ['Gemfile', parseGemfile],
     ['composer.json', parseComposerJson],
   ];
@@ -34,7 +40,21 @@ export async function detectTechStack(projectDir: string): Promise<TechStack> {
     }
   }
 
+  // .NET projects are keyed by a *.csproj/*.sln file with a variable name, so they
+  // cannot be matched by the fixed-name manifest above - probe by extension instead.
+  const dotnet = await parseDotnet(projectDir);
+  if (dotnet) return { ...EMPTY, ...dotnet, ci };
+
   return { ...EMPTY, ci };
+}
+
+async function firstFileWithExt(dir: string, ext: string): Promise<string | null> {
+  try {
+    const files = await readdir(dir);
+    return files.find((f) => f.endsWith(ext)) ?? null;
+  } catch {
+    return null;
+  }
 }
 
 async function detectCi(dir: string): Promise<string | null> {
@@ -186,7 +206,77 @@ async function parseGradle(dir: string): Promise<Partial<TechStack>> {
   return {
     language: 'Java/Kotlin',
     packageManager: 'gradle',
-    framework: content.includes('spring-boot') ? 'Spring Boot' : null,
+    framework: gradleFramework(content),
+  };
+}
+
+async function parseGradleKts(dir: string): Promise<Partial<TechStack>> {
+  const content = (await readText(join(dir, 'build.gradle.kts'))) ?? '';
+  return {
+    language: 'Kotlin',
+    packageManager: 'gradle',
+    framework: gradleFramework(content),
+  };
+}
+
+function gradleFramework(content: string): string | null {
+  if (content.includes('com.android')) return 'Android';
+  if (content.includes('spring-boot')) return 'Spring Boot';
+  return null;
+}
+
+async function parseDenoJson(dir: string): Promise<Partial<TechStack>> {
+  const content =
+    (await readText(join(dir, 'deno.json'))) ?? (await readText(join(dir, 'deno.jsonc'))) ?? '';
+  return {
+    language: 'TypeScript',
+    packageManager: 'deno',
+    runtime: 'Deno',
+    framework: content.includes('fresh') ? 'Fresh' : null,
+  };
+}
+
+async function parseMixExs(dir: string): Promise<Partial<TechStack>> {
+  const content = (await readText(join(dir, 'mix.exs'))) ?? '';
+  return {
+    language: 'Elixir',
+    packageManager: 'mix',
+    framework: content.includes('phoenix') ? 'Phoenix' : null,
+  };
+}
+
+async function parsePubspec(dir: string): Promise<Partial<TechStack>> {
+  const content = (await readText(join(dir, 'pubspec.yaml'))) ?? '';
+  return {
+    language: 'Dart',
+    packageManager: 'pub',
+    framework: isFlutter(content) ? 'Flutter' : null,
+  };
+}
+
+function isFlutter(content: string): boolean {
+  return /sdk:\s*flutter/.test(content) || /^\s*flutter:/m.test(content);
+}
+
+async function parseDotnet(dir: string): Promise<Partial<TechStack> | null> {
+  const csproj = await firstFileWithExt(dir, '.csproj');
+  if (!csproj) return null;
+  const content = (await readText(join(dir, csproj))) ?? '';
+  return {
+    language: 'C#',
+    packageManager: 'NuGet',
+    runtime: '.NET',
+    framework:
+      /Sdk="Microsoft\.NET\.Sdk\.Web"/.test(content) || content.includes('Microsoft.AspNetCore')
+        ? 'ASP.NET Core'
+        : null,
+    testing: /xunit/i.test(content)
+      ? 'xUnit'
+      : /nunit/i.test(content)
+        ? 'NUnit'
+        : /mstest/i.test(content)
+          ? 'MSTest'
+          : null,
   };
 }
 

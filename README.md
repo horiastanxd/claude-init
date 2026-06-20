@@ -209,13 +209,15 @@ Tools exposed: `analyze_project`, `generate_context_files`, `check_context_files
 - **Env vars** - parsed from `.env.example`, with inline comments as descriptions
 - **Git** - default branch, remote, top authors, frequently changed files
 
-Languages: JS/TS (npm, pnpm, yarn, bun), Python (pip, uv, poetry), Rust (cargo),
-Go (modules), Java (Maven, Gradle), Ruby (Bundler), and PHP (Composer).
+Languages: JS/TS (npm, pnpm, yarn, bun), TypeScript on Deno, Python (pip, uv,
+poetry), Rust (cargo), Go (modules), Java/Kotlin (Maven, Gradle), C#/.NET
+(NuGet), Elixir (mix), Dart (pub), Ruby (Bundler), and PHP (Composer).
 
 Frameworks detected include Next.js, Remix, Astro, Angular, Gatsby, NestJS,
-Express, Fastify, Hono, SvelteKit, Nuxt, Vue, Svelte, React (JS/TS); FastAPI,
-Django, Flask (Python); Axum, Actix, Rocket (Rust); Gin, Fiber, Echo (Go);
-Spring Boot (Java); Rails, Sinatra (Ruby); and Laravel, Symfony (PHP).
+Express, Fastify, Hono, SvelteKit, Nuxt, Vue, Svelte, React (JS/TS); Fresh
+(Deno); FastAPI, Django, Flask (Python); Axum, Actix, Rocket (Rust); Gin, Fiber,
+Echo (Go); Spring Boot (Java); ASP.NET Core (.NET); Phoenix (Elixir); Android
+(Kotlin); Flutter (Dart); Rails, Sinatra (Ruby); and Laravel, Symfony (PHP).
 
 It also recognizes databases (PostgreSQL, MySQL, SQLite, MongoDB, Redis,
 Supabase, Prisma, Drizzle), monorepo/build tooling (Nx, Turborepo, Lerna, Vite,

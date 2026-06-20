@@ -151,6 +151,66 @@ describe('detectTechStack', () => {
     await write('.circleci/config.yml', 'version: 2.1\n');
     expect((await detectTechStack(dir)).ci).toBe('CircleCI');
   });
+
+  it('detects Deno from deno.json', async () => {
+    await write('deno.json', JSON.stringify({ tasks: { dev: 'deno run main.ts' } }));
+    const t = await detectTechStack(dir);
+    expect(t).toMatchObject({ language: 'TypeScript', runtime: 'Deno', packageManager: 'deno' });
+  });
+
+  it('detects Deno Fresh framework', async () => {
+    await write('deno.jsonc', JSON.stringify({ imports: { '$fresh/': 'https://deno.land/x/fresh@1.6.8/' } }));
+    expect((await detectTechStack(dir)).framework).toBe('Fresh');
+  });
+
+  it('detects C# / .NET from a .csproj file', async () => {
+    await write('App.csproj', '<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>net8.0</TargetFramework></PropertyGroup></Project>');
+    const t = await detectTechStack(dir);
+    expect(t).toMatchObject({ language: 'C#', runtime: '.NET', packageManager: 'NuGet' });
+  });
+
+  it('detects ASP.NET Core from a web SDK csproj', async () => {
+    await write('Web.csproj', '<Project Sdk="Microsoft.NET.Sdk.Web"><ItemGroup><PackageReference Include="Microsoft.AspNetCore.App" /></ItemGroup></Project>');
+    expect((await detectTechStack(dir)).framework).toBe('ASP.NET Core');
+  });
+
+  it('detects xUnit testing from a csproj', async () => {
+    await write('Tests.csproj', '<Project Sdk="Microsoft.NET.Sdk"><ItemGroup><PackageReference Include="xunit" Version="2.7.0" /></ItemGroup></Project>');
+    expect((await detectTechStack(dir)).testing).toBe('xUnit');
+  });
+
+  it('detects Elixir from mix.exs', async () => {
+    await write('mix.exs', 'defmodule App.MixProject do\n  use Mix.Project\nend\n');
+    const t = await detectTechStack(dir);
+    expect(t).toMatchObject({ language: 'Elixir', packageManager: 'mix' });
+  });
+
+  it('detects Phoenix from mix.exs', async () => {
+    await write('mix.exs', 'defp deps do\n  [{:phoenix, "~> 1.7"}]\nend\n');
+    expect((await detectTechStack(dir)).framework).toBe('Phoenix');
+  });
+
+  it('detects Kotlin from build.gradle.kts', async () => {
+    await write('build.gradle.kts', 'plugins {\n  kotlin("jvm") version "1.9.0"\n}\n');
+    const t = await detectTechStack(dir);
+    expect(t).toMatchObject({ language: 'Kotlin', packageManager: 'gradle' });
+  });
+
+  it('detects Android from build.gradle.kts', async () => {
+    await write('build.gradle.kts', 'plugins {\n  id("com.android.application")\n}\n');
+    expect((await detectTechStack(dir)).framework).toBe('Android');
+  });
+
+  it('detects Dart from pubspec.yaml', async () => {
+    await write('pubspec.yaml', 'name: my_app\nenvironment:\n  sdk: ">=3.0.0 <4.0.0"\n');
+    const t = await detectTechStack(dir);
+    expect(t).toMatchObject({ language: 'Dart', packageManager: 'pub' });
+  });
+
+  it('detects Flutter from pubspec.yaml', async () => {
+    await write('pubspec.yaml', 'name: my_app\ndependencies:\n  flutter:\n    sdk: flutter\n');
+    expect((await detectTechStack(dir)).framework).toBe('Flutter');
+  });
 });
 
 describe('detectCommands', () => {
@@ -192,6 +252,36 @@ describe('detectCommands', () => {
     const c = await detectCommands(dir);
     expect(c.install).toBe('bundle install');
     expect(c.test).toBe('bundle exec rake');
+  });
+
+  it('detects Deno commands from deno.json', async () => {
+    await write('deno.json', JSON.stringify({ tasks: {} }));
+    const c = await detectCommands(dir);
+    expect(c.test).toBe('deno test');
+    expect(c.lint).toBe('deno lint');
+    expect(c.format).toBe('deno fmt');
+  });
+
+  it('detects .NET commands from a csproj', async () => {
+    await write('App.csproj', '<Project Sdk="Microsoft.NET.Sdk"></Project>');
+    const c = await detectCommands(dir);
+    expect(c.install).toBe('dotnet restore');
+    expect(c.build).toBe('dotnet build');
+    expect(c.test).toBe('dotnet test');
+  });
+
+  it('detects Elixir commands from mix.exs', async () => {
+    await write('mix.exs', 'defmodule App.MixProject do\nend\n');
+    const c = await detectCommands(dir);
+    expect(c.install).toBe('mix deps.get');
+    expect(c.test).toBe('mix test');
+  });
+
+  it('detects Flutter commands from pubspec.yaml', async () => {
+    await write('pubspec.yaml', 'name: my_app\ndependencies:\n  flutter:\n    sdk: flutter\n');
+    const c = await detectCommands(dir);
+    expect(c.install).toBe('flutter pub get');
+    expect(c.test).toBe('flutter test');
   });
 
   it('detects PHP commands and scripts from composer.json', async () => {

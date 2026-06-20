@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0]
+
+### Added
+- New language ecosystems: TypeScript on Deno (`deno.json`/`deno.jsonc`), C#/.NET
+  (`*.csproj`), Elixir (`mix.exs`), Kotlin (`build.gradle.kts`) and Dart
+  (`pubspec.yaml`), each with package manager and command detection.
+- New frameworks: Fresh (Deno), ASP.NET Core (.NET, web SDK or AspNetCore ref),
+  Phoenix (Elixir), Android (Gradle `com.android` plugin) and Flutter (Dart).
+- .NET test runner detection (xUnit / NUnit / MSTest) from the `*.csproj`.
+- Toolchain commands for the new ecosystems: `deno test/lint/fmt`, `dotnet
+  restore/build/test`, `mix deps.get/compile/test`, and `flutter`/`dart` pub +
+  test + analyze + format.
+
 ## [0.10.0]
 
 ### Added

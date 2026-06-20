@@ -42,6 +42,20 @@ async function detectBaseCommands(projectDir: string): Promise<ProjectCommands> 
   if (await pathExists(join(projectDir, 'package.json'))) {
     return fromPackageJson(projectDir);
   }
+  if (
+    (await pathExists(join(projectDir, 'deno.json'))) ||
+    (await pathExists(join(projectDir, 'deno.jsonc')))
+  ) {
+    return {
+      install: null,
+      dev: null,
+      build: null,
+      test: 'deno test',
+      lint: 'deno lint',
+      format: 'deno fmt',
+      extra: {},
+    };
+  }
   if (await pathExists(join(projectDir, 'Cargo.toml'))) {
     return {
       install: null,
@@ -112,10 +126,64 @@ async function detectBaseCommands(projectDir: string): Promise<ProjectCommands> 
       extra: {},
     };
   }
+  if (await pathExists(join(projectDir, 'mix.exs'))) {
+    return {
+      install: 'mix deps.get',
+      dev: null,
+      build: 'mix compile',
+      test: 'mix test',
+      lint: null,
+      format: 'mix format',
+      extra: {},
+    };
+  }
+  if (await pathExists(join(projectDir, 'pubspec.yaml'))) {
+    const content = (await readText(join(projectDir, 'pubspec.yaml'))) ?? '';
+    const flutter = /sdk:\s*flutter/.test(content) || /^\s*flutter:/m.test(content);
+    return flutter
+      ? {
+          install: 'flutter pub get',
+          dev: null,
+          build: 'flutter build',
+          test: 'flutter test',
+          lint: 'flutter analyze',
+          format: 'dart format .',
+          extra: {},
+        }
+      : {
+          install: 'dart pub get',
+          dev: null,
+          build: null,
+          test: 'dart test',
+          lint: 'dart analyze',
+          format: 'dart format .',
+          extra: {},
+        };
+  }
   if (await pathExists(join(projectDir, 'composer.json'))) {
     return fromComposerJson(projectDir);
   }
+  if (await firstFileWithExt(projectDir, '.csproj')) {
+    return {
+      install: 'dotnet restore',
+      dev: 'dotnet run',
+      build: 'dotnet build',
+      test: 'dotnet test',
+      lint: null,
+      format: 'dotnet format',
+      extra: {},
+    };
+  }
   return { ...EMPTY };
+}
+
+async function firstFileWithExt(dir: string, ext: string): Promise<string | null> {
+  try {
+    const files = await readdir(dir);
+    return files.find((f) => f.endsWith(ext)) ?? null;
+  } catch {
+    return null;
+  }
 }
 
 async function fromComposerJson(dir: string): Promise<ProjectCommands> {
