@@ -1,0 +1,8 @@
+name: llmignore
+on: [push, pull_request]
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: horiastanxd/llmignore@v0.1
